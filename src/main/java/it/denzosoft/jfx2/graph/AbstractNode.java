@@ -22,6 +22,11 @@ public abstract class AbstractNode implements ProcessingNode {
     protected int maxFrameCount;
     protected volatile boolean bypassed;
 
+    // Clipping detection
+    protected volatile boolean clipping;
+    protected volatile long lastClipTime;
+    private static final long CLIP_HOLD_TIME_MS = 500;  // LED stays on for 500ms after clip
+
     protected AbstractNode(String id, String name, NodeType nodeType) {
         this.id = id;
         this.name = name;
@@ -29,6 +34,8 @@ public abstract class AbstractNode implements ProcessingNode {
         this.inputPorts = new ArrayList<>();
         this.outputPorts = new ArrayList<>();
         this.bypassed = false;
+        this.clipping = false;
+        this.lastClipTime = 0;
     }
 
     /**
@@ -147,6 +154,43 @@ public abstract class AbstractNode implements ProcessingNode {
     @Override
     public void setBypassed(boolean bypassed) {
         this.bypassed = bypassed;
+    }
+
+    @Override
+    public boolean isClipping() {
+        if (!clipping) {
+            return false;
+        }
+        // Check if hold time has expired
+        long elapsed = System.currentTimeMillis() - lastClipTime;
+        if (elapsed > CLIP_HOLD_TIME_MS) {
+            clipping = false;
+            return false;
+        }
+        return true;
+    }
+
+    @Override
+    public void setClipping() {
+        this.clipping = true;
+        this.lastClipTime = System.currentTimeMillis();
+    }
+
+    /**
+     * Check an output buffer for clipping and set the clipping flag if detected.
+     *
+     * @param buffer The output buffer to check
+     * @param frameCount Number of frames to check
+     */
+    protected void checkClipping(float[] buffer, int frameCount) {
+        if (buffer == null) return;
+        int len = Math.min(frameCount, buffer.length);
+        for (int i = 0; i < len; i++) {
+            if (buffer[i] > 1.0f || buffer[i] < -1.0f) {
+                setClipping();
+                return;
+            }
+        }
     }
 
     @Override

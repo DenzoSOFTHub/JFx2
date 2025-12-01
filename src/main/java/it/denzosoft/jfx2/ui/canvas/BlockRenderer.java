@@ -16,6 +16,8 @@ import java.awt.geom.RoundRectangle2D;
 public class BlockRenderer {
 
     private static final int ICON_SIZE = 14;
+    private static final int LED_SIZE = 8;
+    private static final int LED_MARGIN = 6;
     private final PortRenderer portRenderer;
     private static final JComponent ICON_COMPONENT = new JComponent() {};
 
@@ -104,6 +106,32 @@ public class BlockRenderer {
         int textX = iconX + ICON_SIZE + 4;
         int textY = y + (headerH + fm.getAscent() - fm.getDescent()) / 2;
         g2d.drawString(name, textX, textY);
+
+        // Draw clipping LED in top-right corner
+        boolean clipping = node.isClipping();
+        int ledX = x + w - LED_SIZE - LED_MARGIN;
+        int ledY = y + (headerH - LED_SIZE) / 2;
+
+        if (clipping) {
+            // Clipping: bright red LED with glow
+            g2d.setColor(new Color(255, 0, 0, 80));
+            g2d.fillOval(ledX - 3, ledY - 3, LED_SIZE + 6, LED_SIZE + 6);
+            g2d.setColor(new Color(255, 50, 50));
+            g2d.fillOval(ledX, ledY, LED_SIZE, LED_SIZE);
+            // Highlight
+            g2d.setColor(new Color(255, 150, 150));
+            g2d.fillOval(ledX + 1, ledY + 1, LED_SIZE / 2, LED_SIZE / 2);
+        } else {
+            // No clipping: dim LED (dark red/gray)
+            g2d.setColor(new Color(60, 20, 20));
+            g2d.fillOval(ledX, ledY, LED_SIZE, LED_SIZE);
+            g2d.setColor(new Color(80, 30, 30));
+            g2d.fillOval(ledX + 1, ledY + 1, LED_SIZE / 2, LED_SIZE / 2);
+        }
+        // LED border
+        g2d.setColor(new Color(40, 40, 40));
+        g2d.setStroke(new BasicStroke(1));
+        g2d.drawOval(ledX, ledY, LED_SIZE, LED_SIZE);
 
         // Draw bypass indicator
         if (bypassed) {

@@ -98,4 +98,22 @@ public interface ProcessingNode {
      * @param bypassed true to bypass processing
      */
     void setBypassed(boolean bypassed);
+
+    /**
+     * Check if output is currently clipping (samples exceeding -1 to +1 range).
+     * The clipping state has a hold time so the indicator remains visible briefly.
+     *
+     * @return true if clipping was detected recently
+     */
+    default boolean isClipping() {
+        return false;
+    }
+
+    /**
+     * Mark that clipping has been detected.
+     * Called by processing code when samples exceed -1 to +1 range.
+     */
+    default void setClipping() {
+        // Default implementation does nothing
+    }
 }

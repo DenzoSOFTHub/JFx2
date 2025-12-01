@@ -105,6 +105,8 @@ public class EffectNode extends AbstractNode {
                 } else {
                     effect.process(effectBuffer, output, frameCount);
                 }
+                // Check for clipping on output
+                checkClipping(output, frameCount);
             }
         } else if (category == EffectCategory.OUTPUT_SINK) {
             // Output sinks: input port only, consume input
@@ -115,6 +117,8 @@ public class EffectNode extends AbstractNode {
                 } else {
                     effect.process(input, effectBuffer, frameCount);
                 }
+                // Check for clipping on input (the final signal going to output device)
+                checkClipping(input, frameCount);
             }
         } else {
             // Normal effects: both input and output
@@ -129,6 +133,8 @@ public class EffectNode extends AbstractNode {
                 // Process through effect
                 effect.process(input, output, frameCount);
             }
+            // Check for clipping on output
+            checkClipping(output, frameCount);
         }
 
         // Notify monitor listener if set

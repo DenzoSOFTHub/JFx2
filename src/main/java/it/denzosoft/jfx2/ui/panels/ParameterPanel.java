@@ -15,6 +15,7 @@ import it.denzosoft.jfx2.graph.ProcessingNode;
 import it.denzosoft.jfx2.preset.Preset;
 import it.denzosoft.jfx2.preset.PresetManager;
 import it.denzosoft.jfx2.ui.controls.JFaderSlider;
+import it.denzosoft.jfx2.ui.controls.JLedIndicator;
 import it.denzosoft.jfx2.ui.controls.JLedToggle;
 import it.denzosoft.jfx2.ui.controls.JRotaryKnob;
 import it.denzosoft.jfx2.ui.theme.DarkTheme;
@@ -45,9 +46,13 @@ public class ParameterPanel extends JPanel {
     private JPanel headerPanel;
     private JLabel effectNameLabel;
     private JLabel effectCategoryLabel;
+    private JLedIndicator clippingLed;
     private JLedToggle bypassToggle;
     private JPanel controlsPanel;
     private JLabel placeholderLabel;
+
+    // ==================== CLIPPING UPDATE ====================
+    private Timer clippingUpdateTimer;
 
     // ==================== PRESET UI ====================
     private JComboBox<Preset> presetComboBox;
@@ -106,7 +111,22 @@ public class ParameterPanel extends JPanel {
         createControlsPanel();
         createPlaceholder();
 
+        // Timer to update clipping LED (60 fps for responsive feedback)
+        clippingUpdateTimer = new Timer(16, e -> updateClippingLed());
+        clippingUpdateTimer.start();
+
         showPlaceholder();
+    }
+
+    /**
+     * Update the clipping LED based on current node state.
+     */
+    private void updateClippingLed() {
+        if (clippingLed != null && currentNode != null) {
+            clippingLed.setActive(currentNode.isClipping());
+        } else if (clippingLed != null) {
+            clippingLed.setActive(false);
+        }
     }
 
     /**
@@ -203,6 +223,11 @@ public class ParameterPanel extends JPanel {
         signalViewToggle.setToolTipText("Toggle between parameters and signal waveform view");
         signalViewToggle.addActionListener(e -> toggleSignalView());
         rightPanel.add(signalViewToggle);
+
+        // Clipping LED indicator
+        clippingLed = new JLedIndicator("Clip");
+        clippingLed.setToolTipText("Clipping indicator - lights up when output exceeds -1 to +1 range");
+        rightPanel.add(clippingLed);
 
         bypassToggle = new JLedToggle("Bypass");
         bypassToggle.setLedOnColor(DarkTheme.ACCENT_WARNING);
@@ -620,9 +645,12 @@ public class ParameterPanel extends JPanel {
      * Build controls with row-based layout using parameter row sizes.
      */
     private void buildRowBasedControls(List<Parameter> parameters, int[] rowSizes, boolean isDelayEffect) {
-        // Use vertical BoxLayout for rows
-        JPanel rowsContainer = new JPanel();
-        rowsContainer.setLayout(new BoxLayout(rowsContainer, BoxLayout.Y_AXIS));
+        // Use compact row height for effects with many rows
+        final int rowHeight = rowSizes.length > 3 ? 95 : 115;
+        final int numRows = rowSizes.length;
+
+        // Create a panel with GridLayout for fixed row heights
+        JPanel rowsContainer = new JPanel(new GridLayout(numRows, 1, 0, 0));
         rowsContainer.setBackground(DarkTheme.BG_LIGHT);
 
         int paramIndex = 0;
@@ -630,10 +658,8 @@ public class ParameterPanel extends JPanel {
             int paramsInRow = rowSizes[rowIndex];
 
             // Create a row panel with FlowLayout
-            JPanel rowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, CONTROL_GAP / 2, 4));
+            JPanel rowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, CONTROL_GAP / 2, 2));
             rowPanel.setBackground(rowIndex % 2 == 0 ? DarkTheme.BG_LIGHT : DarkTheme.BG_MEDIUM);
-            rowPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
-            rowPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
             // Add parameters for this row
             for (int i = 0; i < paramsInRow && paramIndex < parameters.size(); i++) {
@@ -658,12 +684,18 @@ public class ParameterPanel extends JPanel {
             rowsContainer.add(rowPanel);
         }
 
+        // Set preferred size for scrolling to work
+        int totalHeight = numRows * rowHeight;
+        rowsContainer.setPreferredSize(new Dimension(600, totalHeight));
+
         // Wrap in scroll pane
         JScrollPane scrollPane = new JScrollPane(rowsContainer);
         scrollPane.setBorder(null);
         scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
         scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         scrollPane.getViewport().setBackground(DarkTheme.BG_LIGHT);
+        // Speed up scroll wheel
+        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
 
         controlsPanel.setLayout(new BorderLayout());
         controlsPanel.add(scrollPane, BorderLayout.CENTER);

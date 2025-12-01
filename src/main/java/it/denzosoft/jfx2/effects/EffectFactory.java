@@ -48,6 +48,7 @@ public class EffectFactory {
         // Gain/Dynamics
         register("gain", GainEffect::new);
         register("noisegate", NoiseGateEffect::new);
+        register("noisesuppressor", NoiseSuppressorEffect::new);
         register("compressor", CompressorEffect::new);
         register("multibandcomp", MultibandCompressorEffect::new);
         register("limiter", LimiterEffect::new);
@@ -60,6 +61,7 @@ public class EffectFactory {
         register("drive", DriveEffect::new);
         register("distortion", DistortionEffect::new);
         register("fuzz", FuzzEffect::new);
+        register("tubedist", TubeDistortionEffect::new);
 
         // Time-based / Delay
         register("delay", DelayEffect::new);
@@ -67,6 +69,7 @@ public class EffectFactory {
         register("multitap", MultiTapDelayEffect::new);
         register("reversedelay", ReverseDelayEffect::new);
         register("pingpong", PingPongDelayEffect::new);
+        register("quaddelay", QuadDelayEffect::new);
 
         // Reverb
         register("reverb", ReverbEffect::new);
