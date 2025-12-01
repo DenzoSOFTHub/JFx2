@@ -76,9 +76,23 @@ if [ -z "$(git config user.email)" ]; then
     echo -e "${GREEN}✓ Git user configured${NC}"
 fi
 
-# Get version from pom.xml
-VERSION=$(grep -m1 "<version>" pom.xml | sed 's/.*<version>\(.*\)<\/version>.*/\1/' | tr -d ' ')
+# Get version from build.properties (build.number) - format: 2.0.{build.number}
+if [ -f "build.properties" ]; then
+    BUILD_NUMBER=$(grep "build.number" build.properties | cut -d'=' -f2 | tr -d ' \r\n')
+    VERSION="2.0.${BUILD_NUMBER}"
+else
+    # Fallback to pom.xml if build.properties doesn't exist
+    VERSION=$(grep -m1 "<version>" pom.xml | sed 's/.*<version>\(.*\)<\/version>.*/\1/' | tr -d ' ')
+fi
 echo -e "${BLUE}Current version: ${VERSION}${NC}"
+
+# Update pom.xml version to match build.properties
+POM_VERSION=$(grep -m1 "<version>" pom.xml | sed 's/.*<version>\(.*\)<\/version>.*/\1/' | tr -d ' ')
+if [ "$POM_VERSION" != "$VERSION" ]; then
+    echo -e "${YELLOW}Updating pom.xml version from ${POM_VERSION} to ${VERSION}...${NC}"
+    sed -i "s|<version>${POM_VERSION}</version>|<version>${VERSION}</version>|" pom.xml
+    echo -e "${GREEN}✓ pom.xml version updated${NC}"
+fi
 
 # Check if remote repository exists on GitHub
 echo -e "${YELLOW}Checking if repository exists on GitHub...${NC}"
