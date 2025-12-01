@@ -1,0 +1,41 @@
+{
+  "metadata": {
+    "name": "Basic",
+    "author": "User",
+    "description": "",
+    "category": "Custom",
+    "tags": "",
+    "version": "1.0",
+    "createdAt": "2025-11-28T16:01:02.233693800Z",
+    "modifiedAt": "2025-11-28T16:01:02.238540800Z"
+  },
+  "nodes": [
+    {
+      "id": "distortion",
+      "type": "distortion",
+      "name": "Distortion",
+      "bypassed": true,
+      "parameters": {
+        "drive": 30.7,
+        "preTone": 0.0,
+        "postTone": 4000.0,
+        "clipType": 0.0,
+        "level": -6.0
+      }
+    }
+  ],
+  "connections": [
+    {
+      "sourceNode": "input",
+      "sourcePort": "out",
+      "targetNode": "distortion",
+      "targetPort": "in"
+    },
+    {
+      "sourceNode": "distortion",
+      "sourcePort": "out",
+      "targetNode": "output",
+      "targetPort": "in"
+    }
+  ]
+}

@@ -1,0 +1,70 @@
+{
+  "metadata": {
+    "name": "Gain",
+    "author": "User",
+    "description": "",
+    "category": "Custom",
+    "tags": "",
+    "version": "1.0",
+    "createdAt": "2025-11-30T23:56:08.134308500Z",
+    "modifiedAt": "2025-11-30T23:56:08.144151800Z"
+  },
+  "nodes": [
+    {
+      "id": "gain",
+      "type": "gain",
+      "name": "Gain",
+      "bypassed": false,
+      "x": -80,
+      "y": 20,
+      "parameters": {
+        "stereoMode": 2.0,
+        "gain": 0.48,
+        "saturation": 0.0,
+        "knee": 50.0
+      }
+    },
+    {
+      "id": "audio_input",
+      "type": "audioinput",
+      "name": "Audio Input",
+      "bypassed": false,
+      "x": -300,
+      "y": 20,
+      "parameters": {
+        "stereoMode": 2.0,
+        "device": 0.0,
+        "gain": 0.0,
+        "mute": 0.0
+      }
+    },
+    {
+      "id": "audio_output",
+      "type": "audiooutput",
+      "name": "Audio Output",
+      "bypassed": false,
+      "x": 180,
+      "y": -40,
+      "parameters": {
+        "stereoMode": 2.0,
+        "device": 0.0,
+        "gain": 0.0,
+        "mute": 0.0
+      }
+    }
+  ],
+  "connections": [
+    {
+      "sourceNode": "audio_input",
+      "sourcePort": "out",
+      "targetNode": "gain",
+      "targetPort": "in"
+    },
+    {
+      "sourceNode": "gain",
+      "sourcePort": "out",
+      "targetNode": "audio_output",
+      "targetPort": "in"
+    }
+  ]
+}

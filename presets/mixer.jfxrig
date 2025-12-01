@@ -1,0 +1,102 @@
+{
+  "metadata": {
+    "name": "Mixer",
+    "author": "User",
+    "description": "",
+    "category": "Custom",
+    "tags": "",
+    "version": "1.0",
+    "createdAt": "2025-11-28T21:49:13.214220200Z",
+    "modifiedAt": "2025-11-28T21:49:13.230152400Z"
+  },
+  "nodes": [
+    {
+      "id": "audio_input",
+      "type": "audioinput",
+      "name": "Audio Input",
+      "bypassed": false,
+      "x": -640,
+      "y": -120,
+      "parameters": {
+        "stereoMode": 2.0,
+        "device": 0.0,
+        "gain": 0.0,
+        "mute": 0.0
+      }
+    },
+    {
+      "id": "audio_output",
+      "type": "audiooutput",
+      "name": "Audio Output",
+      "bypassed": false,
+      "x": 20,
+      "y": 40,
+      "parameters": {
+        "stereoMode": 2.0,
+        "device": 0.0,
+        "gain": 0.0,
+        "mute": 0.0
+      }
+    },
+    {
+      "id": "oscillator",
+      "type": "oscillator",
+      "name": "Oscillator",
+      "bypassed": false,
+      "x": -620,
+      "y": 0,
+      "parameters": {
+        "stereoMode": 0.0,
+        "waveform": 0.0,
+        "frequency": 440.0,
+        "volume": -12.0,
+        "playing": 1.0
+      }
+    },
+    {
+      "id": "mixer",
+      "type": "mixer",
+      "name": "Mixer",
+      "bypassed": false,
+      "x": -380,
+      "y": -80,
+      "config": {
+        "numInputs": 4,
+        "stereoMode": "STEREO",
+        "levels": [
+          1.0,
+          1.0,
+          1.0,
+          1.0
+        ],
+        "pans": [
+          -1.0,
+          0.0,
+          0.0,
+          1.0
+        ],
+        "masterLevel": 1.0
+      }
+    }
+  ],
+  "connections": [
+    {
+      "sourceNode": "audio_input",
+      "sourcePort": "out",
+      "targetNode": "mixer",
+      "targetPort": "in1"
+    },
+    {
+      "sourceNode": "oscillator",
+      "sourcePort": "out",
+      "targetNode": "mixer",
+      "targetPort": "in4"
+    },
+    {
+      "sourceNode": "mixer",
+      "sourcePort": "out",
+      "targetNode": "audio_output",
+      "targetPort": "in"
+    }
+  ]
+}

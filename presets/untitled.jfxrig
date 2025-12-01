@@ -1,0 +1,50 @@
+{
+  "metadata": {
+    "name": "Untitled",
+    "author": "User",
+    "description": "",
+    "category": "Custom",
+    "tags": "",
+    "version": "1.0",
+    "createdAt": "2025-11-28T20:42:48.654714100Z",
+    "modifiedAt": "2025-11-28T20:42:48.673021900Z"
+  },
+  "nodes": [
+    {
+      "id": "audio_input",
+      "type": "audioinput",
+      "name": "Audio Input",
+      "bypassed": false,
+      "x": -640,
+      "y": -120,
+      "parameters": {
+        "stereoMode": 2.0,
+        "device": 0.0,
+        "gain": 0.0,
+        "mute": 0.0
+      }
+    },
+    {
+      "id": "audio_output",
+      "type": "audiooutput",
+      "name": "Audio Output",
+      "bypassed": false,
+      "x": 20,
+      "y": 40,
+      "parameters": {
+        "stereoMode": 2.0,
+        "device": 0.0,
+        "gain": 0.0,
+        "mute": 0.0
+      }
+    }
+  ],
+  "connections": [
+    {
+      "sourceNode": "audio_input",
+      "sourcePort": "out",
+      "targetNode": "audio_output",
+      "targetPort": "in"
+    }
+  ]
+}

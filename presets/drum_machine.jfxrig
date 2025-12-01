@@ -1,0 +1,54 @@
+{
+  "metadata": {
+    "name": "Drum Machine",
+    "author": "User",
+    "description": "",
+    "category": "Custom",
+    "tags": "",
+    "version": "1.0",
+    "createdAt": "2025-11-29T17:49:21.087259Z",
+    "modifiedAt": "2025-11-29T17:49:21.098922300Z"
+  },
+  "nodes": [
+    {
+      "id": "audio_output",
+      "type": "audiooutput",
+      "name": "Audio Output",
+      "bypassed": false,
+      "x": 220,
+      "y": -20,
+      "parameters": {
+        "stereoMode": 2.0,
+        "device": 0.0,
+        "gain": 0.0,
+        "mute": 0.0
+      }
+    },
+    {
+      "id": "drum_machine",
+      "type": "drummachine",
+      "name": "Drum Machine",
+      "bypassed": false,
+      "x": -180,
+      "y": -20,
+      "parameters": {
+        "stereoMode": 2.0,
+        "play": 1.0,
+        "bpm": 120.0,
+        "style": 7.0,
+        "volume": 0.0,
+        "countin": 2.0,
+        "accent": 50.0,
+        "swing": 0.0
+      }
+    }
+  ],
+  "connections": [
+    {
+      "sourceNode": "drum_machine",
+      "sourcePort": "out",
+      "targetNode": "audio_output",
+      "targetPort": "in"
+    }
+  ]
+}

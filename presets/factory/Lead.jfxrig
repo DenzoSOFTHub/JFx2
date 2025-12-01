@@ -1,0 +1,181 @@
+{
+  "metadata": {
+    "name": "Lead",
+    "author": "JFx2 Factory",
+    "description": "High gain lead tone for solos",
+    "category": "Lead",
+    "tags": "lead, solo, metal, rock",
+    "version": "1.0",
+    "createdAt": "2024-01-01T00:00:00Z",
+    "modifiedAt": "2024-01-01T00:00:00Z"
+  },
+  "nodes": [
+    {
+      "id": "input",
+      "type": "audioinput",
+      "name": "Audio In",
+      "bypassed": false,
+      "x": 50,
+      "y": 200
+    },
+    {
+      "id": "gate",
+      "type": "noisegate",
+      "name": "Noise Gate",
+      "bypassed": false,
+      "x": 230,
+      "y": 200,
+      "parameters": {
+        "release": 40,
+        "attack": 0.3,
+        "hold": 30,
+        "threshold": -45
+      }
+    },
+    {
+      "id": "comp",
+      "type": "compressor",
+      "name": "Compressor",
+      "bypassed": false,
+      "x": 410,
+      "y": 200,
+      "parameters": {
+        "makeup": 4,
+        "threshold": -20,
+        "attack": 10,
+        "release": 80,
+        "ratio": 4
+      }
+    },
+    {
+      "id": "od",
+      "type": "overdrive",
+      "name": "Boost",
+      "bypassed": false,
+      "x": 590,
+      "y": 200,
+      "parameters": {
+        "tone": 4000,
+        "drive": 3,
+        "level": 3
+      }
+    },
+    {
+      "id": "dist",
+      "type": "distortion",
+      "name": "Distortion",
+      "bypassed": false,
+      "x": 770,
+      "y": 200,
+      "parameters": {
+        "clipType": 0,
+        "preTone": 4,
+        "drive": 35,
+        "level": -3,
+        "postTone": 4500
+      }
+    },
+    {
+      "id": "eq",
+      "type": "parametriceq",
+      "name": "EQ",
+      "bypassed": false,
+      "x": 950,
+      "y": 200,
+      "parameters": {
+        "highMidFreq": 3000,
+        "lowMidFreq": 500,
+        "lowGain": 1,
+        "highGain": 1,
+        "highMidGain": 3,
+        "lowMidGain": -1
+      }
+    },
+    {
+      "id": "delay",
+      "type": "delay",
+      "name": "Delay",
+      "bypassed": false,
+      "x": 1130,
+      "y": 200,
+      "parameters": {
+        "filter": 5000,
+        "feedback": 30,
+        "time": 400,
+        "mix": 20
+      }
+    },
+    {
+      "id": "reverb",
+      "type": "reverb",
+      "name": "Reverb",
+      "bypassed": false,
+      "x": 1310,
+      "y": 200,
+      "parameters": {
+        "predelay": 20,
+        "damp": 40,
+        "mix": 18,
+        "roomSize": 50
+      }
+    },
+    {
+      "id": "output",
+      "type": "audiooutput",
+      "name": "Audio Out",
+      "bypassed": false,
+      "x": 1490,
+      "y": 200
+    }
+  ],
+  "connections": [
+    {
+      "sourceNode": "input",
+      "sourcePort": "out",
+      "targetNode": "gate",
+      "targetPort": "in"
+    },
+    {
+      "sourceNode": "gate",
+      "sourcePort": "out",
+      "targetNode": "comp",
+      "targetPort": "in"
+    },
+    {
+      "sourceNode": "comp",
+      "sourcePort": "out",
+      "targetNode": "od",
+      "targetPort": "in"
+    },
+    {
+      "sourceNode": "od",
+      "sourcePort": "out",
+      "targetNode": "dist",
+      "targetPort": "in"
+    },
+    {
+      "sourceNode": "dist",
+      "sourcePort": "out",
+      "targetNode": "eq",
+      "targetPort": "in"
+    },
+    {
+      "sourceNode": "eq",
+      "sourcePort": "out",
+      "targetNode": "delay",
+      "targetPort": "in"
+    },
+    {
+      "sourceNode": "delay",
+      "sourcePort": "out",
+      "targetNode": "reverb",
+      "targetPort": "in"
+    },
+    {
+      "sourceNode": "reverb",
+      "sourcePort": "out",
+      "targetNode": "output",
+      "targetPort": "in"
+    }
+  ]
+}
