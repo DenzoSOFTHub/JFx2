@@ -124,4 +124,17 @@ public interface AudioEffect {
     default int getLatency() {
         return 0;
     }
+
+    /**
+     * Get the number of parameters per row for UI layout.
+     * Override to organize parameters into multiple rows.
+     *
+     * <p>Example: {5, 5, 5, 5, 5} means 5 rows with 5 parameters each.
+     * Return null or empty array for default single-row layout.</p>
+     *
+     * @return Array of parameter counts per row, or null for default layout
+     */
+    default int[] getParameterRowSizes() {
+        return null;
+    }
 }

@@ -584,30 +584,89 @@ public class ParameterPanel extends JPanel {
 
         boolean isDelayEffect = currentEffect instanceof DelayEffect;
 
-        // Standard layout for other effects
-        controlsPanel.setLayout(new FlowLayout(FlowLayout.LEFT, CONTROL_GAP, CONTROL_GAP));
-
         List<Parameter> parameters = currentEffect.getParameters();
+        int[] rowSizes = currentEffect.getParameterRowSizes();
 
-        for (Parameter param : parameters) {
-            JComponent control = createControlForParameter(param);
-            if (control != null) {
-                // Wrap in labeled panel
-                JPanel wrapper = createControlWrapper(param, control);
-                controlsPanel.add(wrapper);
-                parameterControls.put(param.getId(), control);
+        // Check if effect defines row-based layout
+        if (rowSizes != null && rowSizes.length > 0) {
+            buildRowBasedControls(parameters, rowSizes, isDelayEffect);
+        } else {
+            // Standard single-row FlowLayout for other effects
+            controlsPanel.setLayout(new FlowLayout(FlowLayout.LEFT, CONTROL_GAP, CONTROL_GAP));
 
-                // For DelayEffect, keep reference to BPM knob and add TAP button after it
-                if (isDelayEffect && "bpm".equals(param.getId()) && control instanceof JRotaryKnob) {
-                    bpmKnob = (JRotaryKnob) control;
-                    JPanel tapButton = createTapTempoButton();
-                    controlsPanel.add(tapButton);
+            for (Parameter param : parameters) {
+                JComponent control = createControlForParameter(param);
+                if (control != null) {
+                    // Wrap in labeled panel
+                    JPanel wrapper = createControlWrapper(param, control);
+                    controlsPanel.add(wrapper);
+                    parameterControls.put(param.getId(), control);
+
+                    // For DelayEffect, keep reference to BPM knob and add TAP button after it
+                    if (isDelayEffect && "bpm".equals(param.getId()) && control instanceof JRotaryKnob) {
+                        bpmKnob = (JRotaryKnob) control;
+                        JPanel tapButton = createTapTempoButton();
+                        controlsPanel.add(tapButton);
+                    }
                 }
             }
         }
 
         revalidate();
         repaint();
+    }
+
+    /**
+     * Build controls with row-based layout using parameter row sizes.
+     */
+    private void buildRowBasedControls(List<Parameter> parameters, int[] rowSizes, boolean isDelayEffect) {
+        // Use vertical BoxLayout for rows
+        JPanel rowsContainer = new JPanel();
+        rowsContainer.setLayout(new BoxLayout(rowsContainer, BoxLayout.Y_AXIS));
+        rowsContainer.setBackground(DarkTheme.BG_LIGHT);
+
+        int paramIndex = 0;
+        for (int rowIndex = 0; rowIndex < rowSizes.length && paramIndex < parameters.size(); rowIndex++) {
+            int paramsInRow = rowSizes[rowIndex];
+
+            // Create a row panel with FlowLayout
+            JPanel rowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, CONTROL_GAP / 2, 4));
+            rowPanel.setBackground(rowIndex % 2 == 0 ? DarkTheme.BG_LIGHT : DarkTheme.BG_MEDIUM);
+            rowPanel.setMaximumSize(new Dimension(Integer.MAX_VALUE, 120));
+            rowPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
+
+            // Add parameters for this row
+            for (int i = 0; i < paramsInRow && paramIndex < parameters.size(); i++) {
+                Parameter param = parameters.get(paramIndex);
+                paramIndex++;
+
+                JComponent control = createControlForParameter(param);
+                if (control != null) {
+                    JPanel wrapper = createCompactControlWrapper(param, control);
+                    rowPanel.add(wrapper);
+                    parameterControls.put(param.getId(), control);
+
+                    // For DelayEffect, keep reference to BPM knob and add TAP button after it
+                    if (isDelayEffect && "bpm".equals(param.getId()) && control instanceof JRotaryKnob) {
+                        bpmKnob = (JRotaryKnob) control;
+                        JPanel tapButton = createTapTempoButton();
+                        rowPanel.add(tapButton);
+                    }
+                }
+            }
+
+            rowsContainer.add(rowPanel);
+        }
+
+        // Wrap in scroll pane
+        JScrollPane scrollPane = new JScrollPane(rowsContainer);
+        scrollPane.setBorder(null);
+        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
+        scrollPane.getViewport().setBackground(DarkTheme.BG_LIGHT);
+
+        controlsPanel.setLayout(new BorderLayout());
+        controlsPanel.add(scrollPane, BorderLayout.CENTER);
     }
 
     /**

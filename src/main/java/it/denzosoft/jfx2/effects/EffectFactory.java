@@ -49,9 +49,11 @@ public class EffectFactory {
         register("gain", GainEffect::new);
         register("noisegate", NoiseGateEffect::new);
         register("compressor", CompressorEffect::new);
+        register("multibandcomp", MultibandCompressorEffect::new);
         register("limiter", LimiterEffect::new);
         register("volumeswell", VolumeSwellEffect::new);
         register("sustainer", SustainerEffect::new);
+        register("autosustain", AutoSustainEffect::new);
 
         // Distortion
         register("overdrive", OverdriveEffect::new);
@@ -106,6 +108,7 @@ public class EffectFactory {
         // Pitch (Phase 9)
         register("pitchshift", PitchShifterEffect::new);
         register("octaver", OctaverEffect::new);
+        register("harmonizer", HarmonizerEffect::new);
 
         // Utility
         register("splitter", SplitterEffect::new);
