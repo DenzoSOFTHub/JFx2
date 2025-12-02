@@ -12,13 +12,16 @@ JFx2 is a real-time audio processing application designed for guitarists and aud
 
 ### Key Features
 
-- **Node-Based Signal Routing**: Visual drag-and-drop interface for creating complex signal chains
-- **50+ Audio Effects**: Distortion, delay, reverb, modulation, dynamics, and more
-- **Amp & Cabinet Simulation**: Realistic tube amp modeling with various cabinet types
-- **Neural Amp Modeling (NAM)**: Load and use neural network amp models
-- **Real-Time Processing**: Low-latency audio processing with multi-threaded architecture
-- **Preset Management**: Save, load, and organize your effect chains
-- **Built-in Tools**: Tuner, metronome, drum machine, audio recorder
+- **Node-Based Signal Routing**: Visual drag-and-drop interface for creating complex signal chains with parallel and serial routing
+- **70+ Audio Effects**: Comprehensive collection including distortion, delay, reverb, modulation, pitch, dynamics, and more
+- **Amp & Cabinet Simulation**: Realistic tube amp modeling with preamp, power amp, and cabinet simulation
+- **Neural Amp Modeling (NAM)**: Load and use neural network amp/effect models (.nam files)
+- **Impulse Response Support**: Load custom IR files for cabinet simulation
+- **Real-Time Processing**: Low-latency audio processing with automatic latency compensation
+- **Preset Management**: Save, load, and organize your effect chains as rigs
+- **Built-in Tools**: Chromatic tuner, metronome, drum machine with pattern sequencer, audio recorder
+- **MIDI Recording**: Convert your playing to MIDI with pitch detection
+- **3D Spatial Audio**: HRTF-based 3D panning for immersive sound design
 
 ## Screenshots
 
@@ -88,89 +91,161 @@ java -jar JFx2-2.0.jar
 4. **Adjust Parameters** - Click on any effect block to show its parameters
 5. **Save Your Rig** - Use File > Save Rig to save your configuration
 
-## Effects Library
+---
+
+## Effects Library (70+ Effects)
+
+### Input Sources
+
+| Effect | Description |
+|--------|-------------|
+| **Audio Input** | Capture audio from hardware input device (mic, audio interface) |
+| **WAV File Input** | Play audio files (.wav) as input source |
+| **Oscillator** | Test tone generator with sine, saw, square, triangle waveforms |
+| **Drum Machine** | Pattern-based drum sequencer with multiple kits and time signatures |
+
+### Output & Recording
+
+| Effect | Description |
+|--------|-------------|
+| **Audio Output** | Send processed audio to hardware output device |
+| **WAV File Output** | Record audio to .wav file |
+| **MIDI Recorder** | Convert audio to MIDI using pitch detection (monophonic/polyphonic) |
 
 ### Gain & Dynamics
-| Effect | Description |
-|--------|-------------|
-| Gain | Volume control with saturation curves |
-| Compressor | Dynamic range compression |
-| Limiter | Peak limiting |
-| Noise Gate | Remove unwanted noise |
-| Volume Swell | Automatic volume swells |
 
-### Distortion
 | Effect | Description |
 |--------|-------------|
-| Overdrive | Tube-style soft clipping |
-| Distortion | Hard clipping distortion |
-| Fuzz | Classic fuzz tones |
-| Drive | Transparent gain boost |
+| **Gain** | Volume control with multiple saturation curves |
+| **Noise Gate** | Remove unwanted noise with threshold and range control |
+| **Noise Suppressor** | Advanced noise reduction with frequency-selective gating |
+| **Compressor** | Dynamic range compression with attack, release, ratio, threshold |
+| **Multiband Compressor** | 4-band compressor for precise dynamic control |
+| **Limiter** | Brick-wall peak limiting to prevent clipping |
+| **Volume Swell** | Automatic volume swells with attack time control |
+| **Sustainer** | Increase sustain by boosting quiet signals |
+| **Auto Sustain** | Envelope-based infinite sustain effect |
+
+### Distortion & Overdrive
+
+| Effect | Description |
+|--------|-------------|
+| **Overdrive** | Tube-style soft clipping with tone control |
+| **Drive** | Transparent clean boost and light overdrive |
+| **Distortion** | Hard clipping distortion with EQ shaping |
+| **Fuzz** | Classic 60s/70s style fuzz with bias control |
+| **Tube Distortion** | Tube saturation modeling with multiple tube types |
 
 ### Amp Simulation
-| Effect | Description |
-|--------|-------------|
-| Amp | Full amp simulation with EQ |
-| Tube Preamp | 12AX7 preamp modeling |
-| Tube Power Amp | Power amp saturation |
-| Cabinet Simulator | Speaker cabinet modeling |
-| NAM Loader | Neural Amp Modeler support |
 
-### Modulation
 | Effect | Description |
 |--------|-------------|
-| Chorus | Classic chorus effect |
-| Flanger | Jet-like flanging |
-| Phaser | Phase shifting |
-| Tremolo | Amplitude modulation |
-| Vibrato | Pitch modulation |
-| Rotary | Leslie speaker simulation |
-| UniVibe | Classic vibe effect |
+| **Amp** | Full amplifier simulation with gain stages, tonestack, and presence |
+| **Tube Preamp** | 12AX7 preamp stage modeling with multiple voicings |
+| **Tube Power Amp** | Power amp saturation with sag and compression |
+| **Cabinet Sim** | Speaker cabinet modeling with multiple cab types and mic positions |
+| **Cabinet Simulator** | Extended cabinet simulation with room ambience |
+| **IR Loader** | Load custom impulse response files (.wav) |
+| **Neural Amp (NAM)** | Neural Amp Modeler - load .nam model files |
+| **NAM** | Alternate NAM loader with additional options |
 
-### Delay & Reverb
-| Effect | Description |
-|--------|-------------|
-| Delay | Digital delay with tap tempo |
-| Ping Pong Delay | Stereo bouncing delay |
-| Tape Echo | Vintage tape delay |
-| Multi-Tap Delay | Complex delay patterns |
-| Reverb | Algorithmic reverb |
-| Spring Reverb | Vintage spring reverb |
-| Shimmer Reverb | Pitch-shifted reverb |
+### Delay Effects
 
-### Filter & EQ
 | Effect | Description |
 |--------|-------------|
-| Filter | Multimode filter |
-| Parametric EQ | 4-band parametric |
-| Graphic EQ | 10-band graphic EQ |
-| Wah | Auto and manual wah |
-| Envelope Filter | Funky auto-wah |
+| **Delay** | Digital delay with sync, feedback, and modulation |
+| **Tape Echo** | Vintage tape delay with wow, flutter, and tape saturation |
+| **Multi-Tap Delay** | Up to 8 delay taps with individual timing and level |
+| **Reverse Delay** | Backwards delay for atmospheric effects |
+| **Ping Pong Delay** | Stereo bouncing delay between left and right |
+| **Quad Delay** | 4 independent delay lines with cross-feedback |
+
+### Reverb Effects
+
+| Effect | Description |
+|--------|-------------|
+| **Reverb** | Algorithmic reverb with room size and damping |
+| **Spring Reverb** | Vintage spring tank simulation with drip and splash |
+| **Shimmer Reverb** | Pitch-shifted reverb tails for ambient textures |
+| **Plate Reverb** | Classic studio plate reverb with bright, dense decay |
+| **Room Reverb** | Physically-modeled room with configurable dimensions and materials |
+| **Stereo Image Reverb** | Wide stereo reverb with Haas effect and spatial imaging |
+
+### Modulation Effects
+
+| Effect | Description |
+|--------|-------------|
+| **Chorus** | Classic chorus with rate, depth, and mix control |
+| **Flanger** | Jet-like flanging with resonance and manual control |
+| **Phaser** | Multi-stage phase shifting with sweep and resonance |
+| **Tremolo** | Amplitude modulation with multiple waveforms |
+| **Vibrato** | Pitch modulation with rate and depth |
+| **Panner** | Auto-panning between left and right channels |
+| **Pan 3D** | HRTF-based 3D spatial positioning (360° + elevation) |
+| **Ring Modulator** | Ring modulation with carrier frequency control |
+| **UniVibe** | Classic photocell vibe/chorus effect |
+| **Rotary** | Leslie speaker cabinet simulation with horn and drum |
+
+### EQ & Filter
+
+| Effect | Description |
+|--------|-------------|
+| **Filter** | Multimode filter (LP, HP, BP, Notch) with resonance |
+| **Parametric EQ** | 4-band fully parametric equalizer |
+| **Graphic EQ** | 10-band graphic equalizer |
+| **Wah** | Manual and auto-wah with multiple voicings |
+| **Envelope Filter** | Funky auto-wah triggered by playing dynamics |
+| **Talk Box** | Vowel formant filter for voice-like tones |
 
 ### Pitch & Harmony
+
 | Effect | Description |
 |--------|-------------|
-| Pitch Shifter | Pitch transposition |
-| Octaver | Octave up/down |
-| Ring Modulator | Ring modulation |
+| **Pitch Shifter** | Transpose pitch up or down with formant control |
+| **Octaver** | Analog-style octave up and down generator |
+| **Harmonizer** | Intelligent harmonies based on scale and key |
+| **Auto Tuner** | Gentle pitch correction with expression preservation |
+
+### Synth & Special
+
+| Effect | Description |
+|--------|-------------|
+| **Synth** | Guitar-triggered synthesizer with filter and envelope |
+| **Synth Drone** | Pitch-tracking drone oscillators with intervals |
+| **Pitch Synth** | Full polyphonic synth with wavetables and ADSR |
+| **Acoustic Sim** | Electric to acoustic guitar body simulation (10 models) |
 
 ### Utility
-| Effect | Description |
-|--------|-------------|
-| Splitter | Split signal to multiple paths |
-| Mixer | Mix multiple signals |
-| Mono to Stereo | Convert mono to stereo |
-| Panner | Stereo panning |
-| IR Loader | Load impulse responses |
 
-### Tools
 | Effect | Description |
 |--------|-------------|
-| Oscillator | Test tone generator |
-| Drum Machine | Pattern-based drums |
-| Looper | Audio looper |
-| WAV Input | Play audio files |
-| WAV Output | Record to file |
+| **Splitter** | Split signal to multiple parallel paths |
+| **Mixer** | Mix multiple signals with level control |
+| **Mono to Stereo** | Convert mono to stereo with width control |
+| **Stereo to Mono** | Intelligent stereo to mono with phase correction |
+| **Looper** | Multi-layer audio looper with overdub |
+| **Settings** | Global settings block (tempo, key, tuning reference) |
+
+---
+
+## Audio Features
+
+### Latency Management
+- Automatic calculation of total signal chain latency
+- Per-effect latency reporting
+- Real-time latency display in status bar (I/O + effects breakdown)
+
+### Audio Device Management
+- Multiple input/output device support
+- Automatic device reset on stop for reliable reconnection
+- Manual device reset button in Settings > Audio
+
+### Sample Rates & Buffer Sizes
+- Sample rates: 44.1kHz, 48kHz, 88.2kHz, 96kHz
+- Buffer sizes: 64 to 16384 samples
+- Configurable input mode (Mono/Stereo)
+
+---
 
 ## Keyboard Shortcuts
 
@@ -202,6 +277,19 @@ Access via **Settings > Audio**:
 - Sample Rate: 44100 Hz (default)
 - Buffer Size: 256-1024 samples
 - Input/Output Device selection
+- Reset Input Devices button
+
+### Tuner Settings
+
+Access via **Settings > Tuner**:
+- Reference frequency (A4): 400-480 Hz (default 440 Hz)
+- Standard guitar tuning frequencies displayed
+
+### Soundfont Settings
+
+Access via **Settings > Soundfont**:
+- Use default Java wavetable synthesizer
+- Load external SoundFont files (.sf2, .dls) for MIDI playback
 
 ## Building from Source
 
@@ -249,8 +337,16 @@ JFx2/
 │       └── panels/     # UI panels
 ├── presets/            # Factory presets
 ├── docs/               # Documentation
+│   └── effects/        # Per-effect documentation
 └── scripts/            # Build scripts
 ```
+
+## Documentation
+
+Detailed documentation is available in the `docs/` directory:
+- `docs/ROADMAP.md` - Development roadmap
+- `docs/use-cases/` - Functional specifications
+- `docs/effects/` - Individual effect documentation with parameters, DSP details, and usage tips
 
 ## Contributing
 
