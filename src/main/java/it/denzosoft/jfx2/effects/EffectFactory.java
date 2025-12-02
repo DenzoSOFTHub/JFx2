@@ -125,6 +125,7 @@ public class EffectFactory {
         register("splitter", SplitterEffect::new);
         register("mixer", MixerEffect::new);
         register("mono2stereo", MonoToStereoEffect::new);
+        register("stereo2mono", StereoToMonoEffect::new);
         register("looper", LooperEffect::new);
         register("settings", SettingsEffect::new);
     }
