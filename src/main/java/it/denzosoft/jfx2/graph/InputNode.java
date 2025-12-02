@@ -158,6 +158,45 @@ public class InputNode extends AbstractNode {
     }
 
     /**
+     * Reset all audio input devices used by InputNodes.
+     * Closes all open devices and clears the registry, allowing them to be reopened.
+     */
+    public static void resetAllDevices() {
+        System.out.println("[InputNode] Resetting all input devices...");
+
+        // Close all devices
+        for (InputNode node : new ArrayList<>(devicesInUse.values())) {
+            node.closeDevice();
+        }
+
+        // Clear the registry
+        devicesInUse.clear();
+
+        // Force garbage collection to help release native resources
+        System.gc();
+
+        // Small delay to allow system to release resources
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        System.out.println("[InputNode] All input devices reset.");
+    }
+
+    /**
+     * Reopen all devices after a reset.
+     */
+    public static void reopenAllDevices() {
+        System.out.println("[InputNode] Reopening all input devices...");
+
+        for (InputNode node : new ArrayList<>(devicesInUse.values())) {
+            node.openDevice();
+        }
+    }
+
+    /**
      * Get the InputNode that is using a specific device.
      *
      * @param deviceName Device name

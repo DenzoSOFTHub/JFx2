@@ -4,6 +4,8 @@ import it.denzosoft.jfx2.audio.AudioConfig;
 import it.denzosoft.jfx2.audio.AudioEngine;
 import it.denzosoft.jfx2.audio.AudioSettings;
 import it.denzosoft.jfx2.audio.SoundfontSettings;
+import it.denzosoft.jfx2.effects.impl.AudioInputEffect;
+import it.denzosoft.jfx2.graph.InputNode;
 import it.denzosoft.jfx2.ui.theme.DarkTheme;
 
 import javax.swing.*;
@@ -203,6 +205,27 @@ public class SettingsDialog extends JDialog {
         latencyLabel.setForeground(DarkTheme.ACCENT_PRIMARY);
         latencyLabel.setFont(DarkTheme.FONT_BOLD);
         formPanel.add(latencyLabel, gbc);
+
+        row++;
+
+        // Reset Input Devices button
+        gbc.gridx = 0;
+        gbc.gridy = row;
+        gbc.gridwidth = 2;
+        gbc.weightx = 0;
+        gbc.fill = GridBagConstraints.NONE;
+        gbc.anchor = GridBagConstraints.CENTER;
+        gbc.insets = new Insets(20, 12, 10, 12);
+
+        JButton resetDevicesBtn = new JButton("Reset Input Devices");
+        DarkTheme.styleDialogButton(resetDevicesBtn);
+        resetDevicesBtn.setToolTipText("Close and reopen all audio input devices. " +
+                "Use this if devices are unresponsive or not detected.");
+        resetDevicesBtn.addActionListener(e -> resetInputDevices());
+        formPanel.add(resetDevicesBtn, gbc);
+
+        // Reset gridwidth for any future rows
+        gbc.gridwidth = 1;
 
         panel.add(formPanel, BorderLayout.NORTH);
 
@@ -540,6 +563,41 @@ public class SettingsDialog extends JDialog {
     }
 
     // ==================== UTILITY METHODS ====================
+
+    /**
+     * Reset all audio input devices.
+     * This closes all open input devices and allows them to be reopened.
+     */
+    private void resetInputDevices() {
+        setCursor(Cursor.getPredefinedCursor(Cursor.WAIT_CURSOR));
+
+        // Run in background to avoid UI freeze
+        SwingWorker<Void, Void> worker = new SwingWorker<>() {
+            @Override
+            protected Void doInBackground() {
+                // Reset both InputNode and AudioInputEffect devices
+                InputNode.resetAllDevices();
+                AudioInputEffect.resetAllDevices();
+                return null;
+            }
+
+            @Override
+            protected void done() {
+                setCursor(Cursor.getDefaultCursor());
+
+                // Show confirmation
+                JOptionPane.showMessageDialog(
+                        SettingsDialog.this,
+                        "All audio input devices have been reset.\n" +
+                        "Devices will reconnect automatically when needed.",
+                        "Devices Reset",
+                        JOptionPane.INFORMATION_MESSAGE
+                );
+            }
+        };
+
+        worker.execute();
+    }
 
     private JLabel createLabel(String text) {
         JLabel label = new JLabel(text);

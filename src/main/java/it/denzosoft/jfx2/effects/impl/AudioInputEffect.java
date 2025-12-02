@@ -136,6 +136,48 @@ public class AudioInputEffect extends AbstractEffect {
         return deviceName != null && devicesInUse.containsKey(deviceName);
     }
 
+    /**
+     * Reset all audio input devices.
+     * Closes all open devices and clears the registry, allowing them to be reopened.
+     * This is useful when devices become unresponsive or when the system audio
+     * configuration changes.
+     */
+    public static void resetAllDevices() {
+        System.out.println("[AudioInputEffect] Resetting all input devices...");
+
+        // Close all devices
+        for (AudioInputEffect effect : new ArrayList<>(devicesInUse.values())) {
+            effect.closeDevice();
+        }
+
+        // Clear the registry
+        devicesInUse.clear();
+
+        // Force garbage collection to help release native resources
+        System.gc();
+
+        // Small delay to allow system to release resources
+        try {
+            Thread.sleep(100);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+
+        System.out.println("[AudioInputEffect] All input devices reset.");
+    }
+
+    /**
+     * Reopen all devices after a reset.
+     * This should be called after resetAllDevices() to re-establish connections.
+     */
+    public static void reopenAllDevices() {
+        System.out.println("[AudioInputEffect] Reopening all input devices...");
+
+        for (AudioInputEffect effect : new ArrayList<>(devicesInUse.values())) {
+            effect.updateDevice();
+        }
+    }
+
     @Override
     protected void onPrepare(int sampleRate, int maxFrameCount) {
         // Create audio format
