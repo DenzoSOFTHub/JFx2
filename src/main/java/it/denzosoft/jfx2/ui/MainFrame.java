@@ -3,7 +3,9 @@ package it.denzosoft.jfx2.ui;
 import it.denzosoft.jfx2.audio.AudioEngine;
 import it.denzosoft.jfx2.audio.AudioMetrics;
 import it.denzosoft.jfx2.effects.EffectMetadata;
+import it.denzosoft.jfx2.effects.impl.AudioInputEffect;
 import it.denzosoft.jfx2.graph.Connection;
+import it.denzosoft.jfx2.graph.InputNode;
 import it.denzosoft.jfx2.graph.ProcessingNode;
 import it.denzosoft.jfx2.graph.SignalFlowAnalyzer;
 import it.denzosoft.jfx2.graph.SignalGraph;
@@ -986,6 +988,11 @@ public class MainFrame extends JFrame {
         signalGraph.setInputAudioListener(null);  // Disconnect tuner
         signalGraph.setTunerSourceNode(null);     // Reset tuner source
         statusBarPanel.resetTuner();
+
+        // Reset all audio input devices to ensure clean state for next start
+        InputNode.resetAllDevices();
+        AudioInputEffect.resetAllDevices();
+
         setStatus("Audio stopped");
     }
 
