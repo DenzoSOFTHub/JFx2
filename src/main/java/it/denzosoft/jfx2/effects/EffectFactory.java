@@ -87,6 +87,7 @@ public class EffectFactory {
         register("tremolo", TremoloEffect::new);
         register("vibrato", VibratoEffect::new);
         register("panner", PannerEffect::new);
+        register("pan3d", Pan3DEffect::new);
         register("ringmod", RingModulatorEffect::new);
         register("univibe", UniVibeEffect::new);
         register("rotary", RotaryEffect::new);
