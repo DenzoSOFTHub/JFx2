@@ -80,6 +80,10 @@ build.properties
 
 # Claude Code
 .claude/
+.claude*
+CLAUDE.md
+claude.md
+.claudeignore
 
 # GitHub token file (NEVER commit this!)
 .github_token
