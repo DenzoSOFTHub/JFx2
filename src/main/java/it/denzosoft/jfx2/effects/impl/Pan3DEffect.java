@@ -494,4 +494,11 @@ public class Pan3DEffect extends AbstractEffect {
         prevAngle = smoothAngle;
         prevGainL = prevGainR = 1.0f;
     }
+
+    @Override
+    public int getLatency() {
+        // ITD delay is very small (~0.7ms max at 90°)
+        // Maximum is MAX_ITD_SAMPLES / 2 on average
+        return MAX_ITD_SAMPLES / 2;
+    }
 }

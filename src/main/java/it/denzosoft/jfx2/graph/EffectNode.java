@@ -215,4 +215,9 @@ public class EffectNode extends AbstractNode {
     public EffectMonitorListener getMonitorListener() {
         return monitorListener;
     }
+
+    @Override
+    public int getLatency() {
+        return effect.getLatency();
+    }
 }

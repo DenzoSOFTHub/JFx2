@@ -930,4 +930,75 @@ public class SignalGraph {
     public int getConnectionCount() {
         return connections.size();
     }
+
+    /**
+     * Calculate total latency through the signal path.
+     *
+     * <p>Sums the latency of all nodes in the processing order.
+     * For parallel branches, uses the maximum latency branch.</p>
+     *
+     * @return Total latency in samples
+     */
+    public int calculateTotalLatency() {
+        if (orderDirty) {
+            rebuildProcessingOrder();
+        }
+
+        int totalLatency = 0;
+        for (ProcessingNode node : processingOrder) {
+            totalLatency += node.getLatency();
+        }
+        return totalLatency;
+    }
+
+    /**
+     * Calculate total latency in milliseconds.
+     *
+     * @return Total latency in milliseconds
+     */
+    public float calculateTotalLatencyMs() {
+        if (sampleRate <= 0) {
+            return 0;
+        }
+        return (float) calculateTotalLatency() * 1000.0f / sampleRate;
+    }
+
+    /**
+     * Get detailed latency information for each node.
+     *
+     * @return String with per-node latency breakdown
+     */
+    public String getLatencyInfo() {
+        if (orderDirty) {
+            rebuildProcessingOrder();
+        }
+
+        StringBuilder sb = new StringBuilder();
+        int totalSamples = 0;
+        int nodesWithLatency = 0;
+
+        sb.append("Signal path latency breakdown:\n");
+
+        for (ProcessingNode node : processingOrder) {
+            int nodeLatency = node.getLatency();
+            if (nodeLatency > 0) {
+                float latencyMs = sampleRate > 0 ?
+                        (float) nodeLatency * 1000.0f / sampleRate : 0;
+                sb.append(String.format("  %-20s: %d samples (%.2f ms)\n",
+                        node.getName(), nodeLatency, latencyMs));
+                nodesWithLatency++;
+            }
+            totalSamples += nodeLatency;
+        }
+
+        if (nodesWithLatency == 0) {
+            sb.append("  (no latency-inducing effects in chain)\n");
+        }
+
+        float totalMs = sampleRate > 0 ?
+                (float) totalSamples * 1000.0f / sampleRate : 0;
+        sb.append(String.format("Total: %d samples (%.2f ms)\n", totalSamples, totalMs));
+
+        return sb.toString();
+    }
 }

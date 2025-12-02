@@ -116,4 +116,21 @@ public interface ProcessingNode {
     default void setClipping() {
         // Default implementation does nothing
     }
+
+    /**
+     * Get the processing latency introduced by this node in samples.
+     *
+     * <p>This represents inherent algorithmic latency, not intentional delay.
+     * Examples include:</p>
+     * <ul>
+     *   <li>FFT-based processing (convolution, pitch shifting)</li>
+     *   <li>Look-ahead buffers (limiters, compressors)</li>
+     *   <li>Pitch detection buffers (auto-tuners)</li>
+     * </ul>
+     *
+     * @return Latency in samples (default 0)
+     */
+    default int getLatency() {
+        return 0;
+    }
 }

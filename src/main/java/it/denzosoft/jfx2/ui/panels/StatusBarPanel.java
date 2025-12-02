@@ -125,7 +125,7 @@ public class StatusBarPanel extends JPanel {
         latencyLabel = new JLabel("0ms", JLabel.CENTER);
         latencyLabel.setFont(DarkTheme.FONT_SMALL);
         latencyLabel.setForeground(DarkTheme.TEXT_SECONDARY);
-        latencyLabel.setToolTipText("Latency");
+        latencyLabel.setToolTipText("Total Latency (I/O + Effects)");
         panel.add(latencyLabel);
 
         return panel;
@@ -214,7 +214,44 @@ public class StatusBarPanel extends JPanel {
      */
     public void setLatency(float ms) {
         this.latencyMs = ms;
-        latencyLabel.setText(String.format("%.0fms", ms));
+        latencyLabel.setText(String.format("%.1fms", ms));
+
+        // Color based on latency
+        if (ms > 20) {
+            latencyLabel.setForeground(DarkTheme.ACCENT_ERROR);
+        } else if (ms > 10) {
+            latencyLabel.setForeground(DarkTheme.ACCENT_WARNING);
+        } else {
+            latencyLabel.setForeground(DarkTheme.TEXT_SECONDARY);
+        }
+    }
+
+    /**
+     * Set latency with detailed breakdown for tooltip.
+     *
+     * @param ioMs     I/O buffer latency in milliseconds
+     * @param effectMs Effect processing latency in milliseconds
+     */
+    public void setLatency(float ioMs, float effectMs) {
+        float totalMs = ioMs + effectMs;
+        this.latencyMs = totalMs;
+        latencyLabel.setText(String.format("%.1fms", totalMs));
+
+        // Update tooltip with breakdown
+        latencyLabel.setToolTipText(String.format(
+                "<html>Total Latency: %.1f ms<br>" +
+                "  I/O Buffer: %.1f ms<br>" +
+                "  Effects: %.1f ms</html>",
+                totalMs, ioMs, effectMs));
+
+        // Color based on latency
+        if (totalMs > 20) {
+            latencyLabel.setForeground(DarkTheme.ACCENT_ERROR);
+        } else if (totalMs > 10) {
+            latencyLabel.setForeground(DarkTheme.ACCENT_WARNING);
+        } else {
+            latencyLabel.setForeground(DarkTheme.TEXT_SECONDARY);
+        }
     }
 
     /**

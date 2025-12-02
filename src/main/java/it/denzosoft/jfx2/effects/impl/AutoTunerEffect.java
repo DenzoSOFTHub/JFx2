@@ -348,4 +348,11 @@ public class AutoTunerEffect extends AbstractEffect {
         correctedPitch = 0;
         smoothedCorrection = 0;
     }
+
+    @Override
+    public int getLatency() {
+        // Pitch detection requires filling the buffer before accurate detection
+        // Latency is approximately half the buffer size
+        return BUFFER_SIZE / 2;
+    }
 }

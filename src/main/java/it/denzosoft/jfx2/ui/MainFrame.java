@@ -575,7 +575,10 @@ public class MainFrame extends JFrame {
             AudioMetrics metrics = audioEngine.getMetrics();
             statusBarPanel.setEngineRunning(true);
             statusBarPanel.setCpuUsage((float) metrics.getCpuLoadPercent());
-            statusBarPanel.setLatency((float) audioEngine.getConfig().getEstimatedRoundTripLatencyMs());
+            // Total latency = I/O latency + effect processing latency
+            float ioLatency = (float) audioEngine.getConfig().getEstimatedRoundTripLatencyMs();
+            float effectLatency = signalGraph.calculateTotalLatencyMs();
+            statusBarPanel.setLatency(ioLatency, effectLatency);
 
             // Update level meters from signal graph
             statusBarPanel.setInputLevel(signalGraph.getInputLevelDb());
