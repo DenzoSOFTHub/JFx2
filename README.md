@@ -23,6 +23,14 @@ JFx2 is a real-time audio processing application designed for guitarists and aud
 - **MIDI Recording**: Convert your playing to MIDI with pitch detection
 - **3D Spatial Audio**: HRTF-based 3D panning for immersive sound design
 
+## Documentation
+
+| Document | Description |
+|----------|-------------|
+| **[User Manual](docs/USER_MANUAL.md)** | Complete guide for using JFx2 |
+| **[Technical Documentation](docs/TECHNICAL.md)** | Architecture, DSP, and development guide |
+| **[Effects Reference](docs/effects/)** | Detailed documentation for each effect |
+
 ## Screenshots
 
 ```
@@ -91,6 +99,8 @@ java -jar JFx2-2.0.jar
 4. **Adjust Parameters** - Click on any effect block to show its parameters
 5. **Save Your Rig** - Use File > Save Rig to save your configuration
 
+For detailed instructions, see the **[User Manual](docs/USER_MANUAL.md)**.
+
 ---
 
 ## Effects Library (70+ Effects)
@@ -99,132 +109,131 @@ java -jar JFx2-2.0.jar
 
 | Effect | Description |
 |--------|-------------|
-| **Audio Input** | Capture audio from hardware input device (mic, audio interface) |
-| **WAV File Input** | Play audio files (.wav) as input source |
-| **Oscillator** | Test tone generator with sine, saw, square, triangle waveforms |
-| **Drum Machine** | Pattern-based drum sequencer with multiple kits and time signatures |
+| [**Audio Input**](docs/effects/AudioInputEffect.md) | Capture audio from hardware input device (mic, audio interface) |
+| [**WAV File Input**](docs/effects/WavFileInputEffect.md) | Play audio files (.wav) as input source |
+| [**Oscillator**](docs/effects/OscillatorEffect.md) | Test tone generator with sine, saw, square, triangle waveforms |
+| [**Drum Machine**](docs/effects/DrumMachineEffect.md) | Pattern-based drum sequencer with multiple kits and time signatures |
 
 ### Output & Recording
 
 | Effect | Description |
 |--------|-------------|
-| **Audio Output** | Send processed audio to hardware output device |
-| **WAV File Output** | Record audio to .wav file |
-| **MIDI Recorder** | Convert audio to MIDI using pitch detection (monophonic/polyphonic) |
+| [**Audio Output**](docs/effects/AudioOutputEffect.md) | Send processed audio to hardware output device |
+| [**WAV File Output**](docs/effects/WavFileOutputEffect.md) | Record audio to .wav file |
+| [**MIDI Recorder**](docs/effects/MidiRecorderEffect.md) | Convert audio to MIDI using pitch detection (monophonic/polyphonic) |
 
 ### Gain & Dynamics
 
 | Effect | Description |
 |--------|-------------|
-| **Gain** | Volume control with multiple saturation curves |
-| **Noise Gate** | Remove unwanted noise with threshold and range control |
-| **Noise Suppressor** | Advanced noise reduction with frequency-selective gating |
-| **Compressor** | Dynamic range compression with attack, release, ratio, threshold |
-| **Multiband Compressor** | 4-band compressor for precise dynamic control |
-| **Limiter** | Brick-wall peak limiting to prevent clipping |
-| **Volume Swell** | Automatic volume swells with attack time control |
-| **Sustainer** | Increase sustain by boosting quiet signals |
-| **Auto Sustain** | Envelope-based infinite sustain effect |
+| [**Gain**](docs/effects/GainEffect.md) | Volume control with multiple saturation curves |
+| [**Noise Gate**](docs/effects/NoiseGateEffect.md) | Remove unwanted noise with threshold and range control |
+| [**Noise Suppressor**](docs/effects/NoiseSuppressorEffect.md) | Advanced noise reduction with frequency-selective gating |
+| [**Compressor**](docs/effects/CompressorEffect.md) | Dynamic range compression with attack, release, ratio, threshold |
+| [**Multiband Compressor**](docs/effects/MultibandCompressorEffect.md) | 4-band compressor for precise dynamic control |
+| [**Limiter**](docs/effects/LimiterEffect.md) | Brick-wall peak limiting to prevent clipping |
+| [**Volume Swell**](docs/effects/VolumeSwellEffect.md) | Automatic volume swells with attack time control |
+| [**Sustainer**](docs/effects/SustainerEffect.md) | Increase sustain by boosting quiet signals |
+| [**Auto Sustain**](docs/effects/AutoSustainEffect.md) | Envelope-based infinite sustain effect |
 
 ### Distortion & Overdrive
 
 | Effect | Description |
 |--------|-------------|
-| **Overdrive** | Tube-style soft clipping with tone control |
-| **Drive** | Transparent clean boost and light overdrive |
-| **Distortion** | Hard clipping distortion with EQ shaping |
-| **Fuzz** | Classic 60s/70s style fuzz with bias control |
-| **Tube Distortion** | Tube saturation modeling with multiple tube types |
+| [**Overdrive**](docs/effects/OverdriveEffect.md) | Tube-style soft clipping with tone control |
+| [**Drive**](docs/effects/DriveEffect.md) | Transparent clean boost and light overdrive |
+| [**Distortion**](docs/effects/DistortionEffect.md) | Hard clipping distortion with EQ shaping |
+| [**Fuzz**](docs/effects/FuzzEffect.md) | Classic 60s/70s style fuzz with bias control |
+| [**Tube Distortion**](docs/effects/TubeDistortionEffect.md) | Tube saturation modeling with multiple tube types |
 
 ### Amp Simulation
 
 | Effect | Description |
 |--------|-------------|
-| **Amp** | Full amplifier simulation with gain stages, tonestack, and presence |
-| **Tube Preamp** | 12AX7 preamp stage modeling with multiple voicings |
-| **Tube Power Amp** | Power amp saturation with sag and compression |
-| **Cabinet Sim** | Speaker cabinet modeling with multiple cab types and mic positions |
-| **Cabinet Simulator** | Extended cabinet simulation with room ambience |
-| **IR Loader** | Load custom impulse response files (.wav) |
-| **Neural Amp (NAM)** | Neural Amp Modeler - load .nam model files |
-| **NAM** | Alternate NAM loader with additional options |
+| [**Amp**](docs/effects/AmpEffect.md) | Full amplifier simulation with gain stages, tonestack, and presence |
+| [**Tube Preamp**](docs/effects/TubePreampEffect.md) | 12AX7 preamp stage modeling with multiple voicings |
+| [**Tube Power Amp**](docs/effects/TubePowerAmpEffect.md) | Power amp saturation with sag and compression |
+| [**Cabinet Sim**](docs/effects/CabinetSimEffect.md) | Speaker cabinet modeling with multiple cab types and mic positions |
+| [**Cabinet Simulator**](docs/effects/CabinetSimulatorEffect.md) | Extended cabinet simulation with room ambience |
+| [**IR Loader**](docs/effects/IRLoaderEffect.md) | Load custom impulse response files (.wav) |
+| [**Neural Amp**](docs/effects/NeuralAmpEffect.md) | Neural Amp Modeler - load .nam model files |
+| [**NAM**](docs/effects/NAMEffect.md) | Alternate NAM loader with additional options |
 
 ### Delay Effects
 
 | Effect | Description |
 |--------|-------------|
-| **Delay** | Digital delay with sync, feedback, and modulation |
-| **Tape Echo** | Vintage tape delay with wow, flutter, and tape saturation |
-| **Multi-Tap Delay** | Up to 8 delay taps with individual timing and level |
-| **Reverse Delay** | Backwards delay for atmospheric effects |
-| **Ping Pong Delay** | Stereo bouncing delay between left and right |
-| **Quad Delay** | 4 independent delay lines with cross-feedback |
+| [**Delay**](docs/effects/DelayEffect.md) | Digital delay with sync, feedback, and modulation |
+| [**Tape Echo**](docs/effects/TapeEchoEffect.md) | Vintage tape delay with wow, flutter, and tape saturation |
+| [**Multi-Tap Delay**](docs/effects/MultiTapDelayEffect.md) | Up to 8 delay taps with individual timing and level |
+| [**Reverse Delay**](docs/effects/ReverseDelayEffect.md) | Backwards delay for atmospheric effects |
+| [**Ping Pong Delay**](docs/effects/PingPongDelayEffect.md) | Stereo bouncing delay between left and right |
+| [**Quad Delay**](docs/effects/QuadDelayEffect.md) | 4 independent delay lines with cross-feedback |
 
 ### Reverb Effects
 
 | Effect | Description |
 |--------|-------------|
-| **Reverb** | Algorithmic reverb with room size and damping |
-| **Spring Reverb** | Vintage spring tank simulation with drip and splash |
-| **Shimmer Reverb** | Pitch-shifted reverb tails for ambient textures |
-| **Plate Reverb** | Classic studio plate reverb with bright, dense decay |
-| **Room Reverb** | Physically-modeled room with configurable dimensions and materials |
-| **Stereo Image Reverb** | Wide stereo reverb with Haas effect and spatial imaging |
+| [**Reverb**](docs/effects/ReverbEffect.md) | Algorithmic reverb with room size and damping |
+| [**Spring Reverb**](docs/effects/SpringReverbEffect.md) | Vintage spring tank simulation with drip and splash |
+| [**Shimmer Reverb**](docs/effects/ShimmerReverbEffect.md) | Pitch-shifted reverb tails for ambient textures |
+| [**Plate Reverb**](docs/effects/PlateReverbEffect.md) | Classic studio plate reverb with bright, dense decay |
+| [**Room Reverb**](docs/effects/RoomReverbEffect.md) | Physically-modeled room with configurable dimensions and materials |
+| [**Stereo Image Reverb**](docs/effects/StereoImageReverbEffect.md) | Wide stereo reverb with Haas effect and spatial imaging |
 
 ### Modulation Effects
 
 | Effect | Description |
 |--------|-------------|
-| **Chorus** | Classic chorus with rate, depth, and mix control |
-| **Flanger** | Jet-like flanging with resonance and manual control |
-| **Phaser** | Multi-stage phase shifting with sweep and resonance |
-| **Tremolo** | Amplitude modulation with multiple waveforms |
-| **Vibrato** | Pitch modulation with rate and depth |
-| **Panner** | Auto-panning between left and right channels |
-| **Pan 3D** | HRTF-based 3D spatial positioning (360° + elevation) |
-| **Ring Modulator** | Ring modulation with carrier frequency control |
-| **UniVibe** | Classic photocell vibe/chorus effect |
-| **Rotary** | Leslie speaker cabinet simulation with horn and drum |
+| [**Chorus**](docs/effects/ChorusEffect.md) | Classic chorus with rate, depth, and mix control |
+| [**Flanger**](docs/effects/FlangerEffect.md) | Jet-like flanging with resonance and manual control |
+| [**Phaser**](docs/effects/PhaserEffect.md) | Multi-stage phase shifting with sweep and resonance |
+| [**Tremolo**](docs/effects/TremoloEffect.md) | Amplitude modulation with multiple waveforms |
+| [**Vibrato**](docs/effects/VibratoEffect.md) | Pitch modulation with rate and depth |
+| [**Panner**](docs/effects/PannerEffect.md) | Auto-panning between left and right channels |
+| [**Pan 3D**](docs/effects/Pan3DEffect.md) | HRTF-based 3D spatial positioning (360° + elevation) |
+| [**Ring Modulator**](docs/effects/RingModulatorEffect.md) | Ring modulation with carrier frequency control |
+| [**UniVibe**](docs/effects/UniVibeEffect.md) | Classic photocell vibe/chorus effect |
+| [**Rotary**](docs/effects/RotaryEffect.md) | Leslie speaker cabinet simulation with horn and drum |
 
 ### EQ & Filter
 
 | Effect | Description |
 |--------|-------------|
-| **Filter** | Multimode filter (LP, HP, BP, Notch) with resonance |
-| **Parametric EQ** | 4-band fully parametric equalizer |
-| **Graphic EQ** | 10-band graphic equalizer |
-| **Wah** | Manual and auto-wah with multiple voicings |
-| **Envelope Filter** | Funky auto-wah triggered by playing dynamics |
-| **Talk Box** | Vowel formant filter for voice-like tones |
+| [**Filter**](docs/effects/FilterEffect.md) | Multimode filter (LP, HP, BP, Notch) with resonance |
+| [**Parametric EQ**](docs/effects/ParametricEQEffect.md) | 4-band fully parametric equalizer |
+| [**Graphic EQ**](docs/effects/GraphicEQEffect.md) | 10-band graphic equalizer |
+| [**Wah**](docs/effects/WahEffect.md) | Manual and auto-wah with multiple voicings |
+| [**Envelope Filter**](docs/effects/EnvelopeFilterEffect.md) | Funky auto-wah triggered by playing dynamics |
+| [**Talk Box**](docs/effects/TalkBoxEffect.md) | Vowel formant filter for voice-like tones |
 
 ### Pitch & Harmony
 
 | Effect | Description |
 |--------|-------------|
-| **Pitch Shifter** | Transpose pitch up or down with formant control |
-| **Octaver** | Analog-style octave up and down generator |
-| **Harmonizer** | Intelligent harmonies based on scale and key |
-| **Auto Tuner** | Gentle pitch correction with expression preservation |
+| [**Pitch Shifter**](docs/effects/PitchShifterEffect.md) | Transpose pitch up or down with formant control |
+| [**Octaver**](docs/effects/OctaverEffect.md) | Analog-style octave up and down generator |
+| [**Harmonizer**](docs/effects/HarmonizerEffect.md) | Intelligent harmonies based on scale and key |
+| [**Auto Tuner**](docs/effects/AutoTunerEffect.md) | Gentle pitch correction with expression preservation |
 
 ### Synth & Special
 
 | Effect | Description |
 |--------|-------------|
-| **Synth** | Guitar-triggered synthesizer with filter and envelope |
-| **Synth Drone** | Pitch-tracking drone oscillators with intervals |
-| **Pitch Synth** | Full polyphonic synth with wavetables and ADSR |
-| **Acoustic Sim** | Electric to acoustic guitar body simulation (10 models) |
+| [**Synth**](docs/effects/SynthEffect.md) | Guitar-triggered synthesizer with filter and envelope |
+| [**Synth Drone**](docs/effects/SynthDroneEffect.md) | Pitch-tracking drone oscillators with intervals |
+| [**Pitch Synth**](docs/effects/PitchSynthEffect.md) | Full polyphonic synth with wavetables and ADSR |
+| [**Acoustic Sim**](docs/effects/AcousticSimEffect.md) | Electric to acoustic guitar body simulation (10 models) |
 
 ### Utility
 
 | Effect | Description |
 |--------|-------------|
-| **Splitter** | Split signal to multiple parallel paths |
-| **Mixer** | Mix multiple signals with level control |
-| **Mono to Stereo** | Convert mono to stereo with width control |
-| **Stereo to Mono** | Intelligent stereo to mono with phase correction |
-| **Looper** | Multi-layer audio looper with overdub |
-| **Settings** | Global settings block (tempo, key, tuning reference) |
+| [**Splitter**](docs/effects/SplitterEffect.md) | Split signal to multiple parallel paths |
+| [**Mixer**](docs/effects/MixerEffect.md) | Mix multiple signals with level control |
+| [**Mono to Stereo**](docs/effects/MonoToStereoEffect.md) | Convert mono to stereo with width control |
+| [**Stereo to Mono**](docs/effects/StereoToMonoEffect.md) | Intelligent stereo to mono with phase correction |
+| [**Looper**](docs/effects/LooperEffect.md) | Multi-layer audio looper with overdub |
 
 ---
 
@@ -337,16 +346,11 @@ JFx2/
 │       └── panels/     # UI panels
 ├── presets/            # Factory presets
 ├── docs/               # Documentation
+│   ├── USER_MANUAL.md  # User guide
+│   ├── TECHNICAL.md    # Technical documentation
 │   └── effects/        # Per-effect documentation
 └── scripts/            # Build scripts
 ```
-
-## Documentation
-
-Detailed documentation is available in the `docs/` directory:
-- `docs/ROADMAP.md` - Development roadmap
-- `docs/use-cases/` - Functional specifications
-- `docs/effects/` - Individual effect documentation with parameters, DSP details, and usage tips
 
 ## Contributing
 
