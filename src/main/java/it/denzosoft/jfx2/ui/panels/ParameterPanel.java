@@ -8,6 +8,7 @@ import it.denzosoft.jfx2.effects.impl.FilterEffect;
 import it.denzosoft.jfx2.effects.impl.GraphicEQEffect;
 import it.denzosoft.jfx2.effects.impl.LooperEffect;
 import it.denzosoft.jfx2.effects.impl.NoiseGateEffect;
+import it.denzosoft.jfx2.effects.impl.SettingsEffect;
 import it.denzosoft.jfx2.graph.EffectNode;
 import it.denzosoft.jfx2.graph.EffectNode.EffectMonitorListener;
 import it.denzosoft.jfx2.graph.MixerNode;
@@ -416,8 +417,9 @@ public class ParameterPanel extends JPanel {
         JScrollPane controlsScrollPane = new JScrollPane(controlsPanel);
         controlsScrollPane.setBorder(null);
         controlsScrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        controlsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_NEVER);
+        controlsScrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
         controlsScrollPane.getViewport().setBackground(DarkTheme.BG_LIGHT);
+        controlsScrollPane.getVerticalScrollBar().setUnitIncrement(16);
 
         // Create signal visualization panels
         signalWaveformPanel = new SignalWaveformPanel();
@@ -563,6 +565,16 @@ public class ParameterPanel extends JPanel {
     }
 
     /**
+     * Update the bypass toggle to match the current node's bypass state.
+     * Called when bypass is toggled from outside (e.g., double-click on canvas).
+     */
+    public void updateBypassState() {
+        if (currentNode != null) {
+            bypassToggle.setSelected(currentNode.isBypassed());
+        }
+    }
+
+    /**
      * Build parameter controls for current effect.
      */
     private void buildControls() {
@@ -607,6 +619,11 @@ public class ParameterPanel extends JPanel {
             return;
         }
 
+        if (currentEffect instanceof SettingsEffect settings) {
+            buildSettingsControls(settings);
+            return;
+        }
+
         boolean isDelayEffect = currentEffect instanceof DelayEffect;
 
         List<Parameter> parameters = currentEffect.getParameters();
@@ -647,19 +664,35 @@ public class ParameterPanel extends JPanel {
     private void buildRowBasedControls(List<Parameter> parameters, int[] rowSizes, boolean isDelayEffect) {
         // Use compact row height for effects with many rows
         final int rowHeight = rowSizes.length > 3 ? 95 : 115;
-        final int numRows = rowSizes.length;
 
-        // Create a panel with GridLayout for fixed row heights
-        JPanel rowsContainer = new JPanel(new GridLayout(numRows, 1, 0, 0));
-        rowsContainer.setBackground(DarkTheme.BG_LIGHT);
+        // Use BoxLayout for vertical stacking - controlsPanel is already in a JScrollPane
+        controlsPanel.setLayout(new BoxLayout(controlsPanel, BoxLayout.Y_AXIS));
 
         int paramIndex = 0;
         for (int rowIndex = 0; rowIndex < rowSizes.length && paramIndex < parameters.size(); rowIndex++) {
             int paramsInRow = rowSizes[rowIndex];
 
-            // Create a row panel with FlowLayout
-            JPanel rowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, CONTROL_GAP / 2, 2));
+            // Create a row panel with FlowLayout and FIXED height
+            JPanel rowPanel = new JPanel(new FlowLayout(FlowLayout.LEFT, CONTROL_GAP / 2, 2)) {
+                @Override
+                public Dimension getPreferredSize() {
+                    Dimension d = super.getPreferredSize();
+                    d.height = rowHeight;
+                    return d;
+                }
+                @Override
+                public Dimension getMinimumSize() {
+                    return new Dimension(100, rowHeight);
+                }
+                @Override
+                public Dimension getMaximumSize() {
+                    Dimension d = super.getMaximumSize();
+                    d.height = rowHeight;
+                    return d;
+                }
+            };
             rowPanel.setBackground(rowIndex % 2 == 0 ? DarkTheme.BG_LIGHT : DarkTheme.BG_MEDIUM);
+            rowPanel.setAlignmentX(Component.LEFT_ALIGNMENT);
 
             // Add parameters for this row
             for (int i = 0; i < paramsInRow && paramIndex < parameters.size(); i++) {
@@ -681,24 +714,8 @@ public class ParameterPanel extends JPanel {
                 }
             }
 
-            rowsContainer.add(rowPanel);
+            controlsPanel.add(rowPanel);
         }
-
-        // Set preferred size for scrolling to work
-        int totalHeight = numRows * rowHeight;
-        rowsContainer.setPreferredSize(new Dimension(600, totalHeight));
-
-        // Wrap in scroll pane
-        JScrollPane scrollPane = new JScrollPane(rowsContainer);
-        scrollPane.setBorder(null);
-        scrollPane.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_AS_NEEDED);
-        scrollPane.getViewport().setBackground(DarkTheme.BG_LIGHT);
-        // Speed up scroll wheel
-        scrollPane.getVerticalScrollBar().setUnitIncrement(16);
-
-        controlsPanel.setLayout(new BorderLayout());
-        controlsPanel.add(scrollPane, BorderLayout.CENTER);
     }
 
     /**
@@ -1175,6 +1192,133 @@ public class ParameterPanel extends JPanel {
         // Layout: parameters on left, meters on right
         controlsPanel.add(paramsPanel, BorderLayout.CENTER);
         controlsPanel.add(meterContainer, BorderLayout.EAST);
+
+        revalidate();
+        repaint();
+    }
+
+    /**
+     * Build controls for SettingsEffect with TAP tempo button.
+     */
+    private void buildSettingsControls(SettingsEffect settings) {
+        controlsPanel.setLayout(new FlowLayout(FlowLayout.LEFT, CONTROL_GAP, CONTROL_GAP));
+
+        // BPM display knob
+        Parameter bpmParam = settings.getParameter("bpm");
+        JRotaryKnob bpmKnob = new JRotaryKnob(
+                bpmParam.getMinValue(),
+                bpmParam.getMaxValue(),
+                bpmParam.getDefaultValue(),
+                "BPM"
+        );
+        bpmKnob.setValue(bpmParam.getTargetValue());
+        bpmKnob.setLabel("Tempo");
+        bpmKnob.setArcForegroundColor(DarkTheme.ACCENT_PRIMARY);
+        bpmKnob.setToolTipText("Current tempo in BPM. Use TAP button or turn knob to set.");
+
+        // Update parameter when knob changes
+        bpmKnob.addPropertyChangeListener("value", e -> {
+            if ("value".equals(e.getPropertyName())) {
+                settings.setBpm((float) (double) e.getNewValue());
+                firePropertyChange("parameterChanged", null, bpmParam);
+            }
+        });
+
+        JPanel bpmWrapper = createControlWrapper(bpmParam, bpmKnob);
+        controlsPanel.add(bpmWrapper);
+        parameterControls.put(bpmParam.getId(), bpmKnob);
+
+        // Quarter note duration display (create first so tap can update it)
+        JPanel durationPanel = new JPanel();
+        durationPanel.setLayout(new BoxLayout(durationPanel, BoxLayout.Y_AXIS));
+        durationPanel.setOpaque(false);
+        durationPanel.setBorder(BorderFactory.createEmptyBorder(10, 20, 10, 20));
+
+        JLabel durationTitle = new JLabel("Note Durations");
+        durationTitle.setFont(DarkTheme.FONT_BOLD);
+        durationTitle.setForeground(DarkTheme.TEXT_PRIMARY);
+        durationTitle.setAlignmentX(Component.LEFT_ALIGNMENT);
+        durationPanel.add(durationTitle);
+        durationPanel.add(Box.createVerticalStrut(8));
+
+        // Duration labels that update with BPM
+        JLabel quarterLabel = new JLabel();
+        JLabel eighthLabel = new JLabel();
+        JLabel sixteenthLabel = new JLabel();
+        JLabel dottedEighthLabel = new JLabel();
+
+        for (JLabel label : new JLabel[]{quarterLabel, eighthLabel, sixteenthLabel, dottedEighthLabel}) {
+            label.setFont(DarkTheme.FONT_SMALL);
+            label.setForeground(DarkTheme.TEXT_SECONDARY);
+            label.setAlignmentX(Component.LEFT_ALIGNMENT);
+            durationPanel.add(label);
+        }
+
+        // Update duration labels function
+        Runnable updateDurations = () -> {
+            quarterLabel.setText(String.format("1/4 note: %.0f ms", settings.getQuarterNoteMs()));
+            eighthLabel.setText(String.format("1/8 note: %.0f ms", settings.getEighthNoteMs()));
+            sixteenthLabel.setText(String.format("1/16 note: %.0f ms", settings.getSixteenthNoteMs()));
+            dottedEighthLabel.setText(String.format("Dotted 1/8: %.0f ms", settings.getDottedEighthNoteMs()));
+        };
+        updateDurations.run();
+
+        // TAP button
+        JPanel tapPanel = new JPanel();
+        tapPanel.setLayout(new BoxLayout(tapPanel, BoxLayout.Y_AXIS));
+        tapPanel.setOpaque(false);
+
+        // Spacer to align with knob
+        tapPanel.add(Box.createVerticalStrut(15));
+
+        JButton tapButton = new JButton("TAP");
+        tapButton.setFont(DarkTheme.FONT_BOLD.deriveFont(16f));
+        tapButton.setForeground(Color.WHITE);
+        tapButton.setBackground(DarkTheme.ACCENT_PRIMARY);
+        tapButton.setFocusPainted(false);
+        tapButton.setBorderPainted(true);
+        tapButton.setPreferredSize(new Dimension(80, 60));
+        tapButton.setMaximumSize(new Dimension(80, 60));
+        tapButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        tapButton.setToolTipText("Tap repeatedly to set tempo");
+        tapButton.setBorder(BorderFactory.createCompoundBorder(
+                BorderFactory.createLineBorder(DarkTheme.ACCENT_PRIMARY.darker(), 2),
+                BorderFactory.createEmptyBorder(8, 16, 8, 16)
+        ));
+
+        // Tap handling - works without audio engine running
+        tapButton.addActionListener(e -> {
+            // Call tap to record timestamp and calculate BPM
+            settings.tap();
+
+            // Read the updated BPM value (use getTargetValue, not getValue)
+            float currentBpm = bpmParam.getTargetValue();
+
+            // Update UI
+            bpmKnob.setValue(currentBpm);
+            updateDurations.run();
+        });
+
+        tapPanel.add(tapButton);
+
+        // Label below button
+        JLabel tapLabel = new JLabel("Tap Tempo");
+        tapLabel.setFont(DarkTheme.FONT_SMALL);
+        tapLabel.setForeground(DarkTheme.TEXT_SECONDARY);
+        tapLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        tapPanel.add(Box.createVerticalStrut(4));
+        tapPanel.add(tapLabel);
+
+        controlsPanel.add(tapPanel);
+
+        // Update durations when BPM knob changes manually
+        bpmKnob.addPropertyChangeListener("value", e -> {
+            if ("value".equals(e.getPropertyName())) {
+                updateDurations.run();
+            }
+        });
+
+        controlsPanel.add(durationPanel);
 
         revalidate();
         repaint();

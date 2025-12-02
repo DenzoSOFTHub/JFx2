@@ -118,13 +118,33 @@ public class EffectPalettePanel extends JPanel {
      * Create the effect tree with custom rendering.
      */
     private JTree createEffectTree() {
-        JTree tree = new JTree(treeModel);
+        JTree tree = new JTree(treeModel) {
+            @Override
+            public String getToolTipText(java.awt.event.MouseEvent e) {
+                TreePath path = getPathForLocation(e.getX(), e.getY());
+                if (path != null) {
+                    Object node = path.getLastPathComponent();
+                    if (node instanceof DefaultMutableTreeNode treeNode) {
+                        Object userObj = treeNode.getUserObject();
+                        if (userObj instanceof EffectMetadata meta) {
+                            return "<html><b>" + meta.name() + "</b><br>" + meta.description() + "</html>";
+                        } else if (userObj instanceof EffectCategory cat) {
+                            return cat.getDisplayName();
+                        }
+                    }
+                }
+                return null;
+            }
+        };
         tree.setBackground(DarkTheme.BG_DARK);
         tree.setForeground(DarkTheme.TEXT_PRIMARY);
         tree.setRootVisible(false);
         tree.setShowsRootHandles(true);
         tree.setRowHeight(28);
         tree.setCellRenderer(new EffectTreeCellRenderer());
+
+        // Enable tooltips for the tree
+        ToolTipManager.sharedInstance().registerComponent(tree);
 
         // Expand all by default
         tree.expandRow(0);

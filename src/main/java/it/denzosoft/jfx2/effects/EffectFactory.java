@@ -44,6 +44,7 @@ public class EffectFactory {
         // Output Sinks (audio output and recorders)
         register("audiooutput", AudioOutputEffect::new);
         register("wavfileoutput", WavFileOutputEffect::new);
+        register("midirecorder", MidiRecorderEffect::new);
 
         // Gain/Dynamics
         register("gain", GainEffect::new);
@@ -75,6 +76,9 @@ public class EffectFactory {
         register("reverb", ReverbEffect::new);
         register("springreverb", SpringReverbEffect::new);
         register("shimmerreverb", ShimmerReverbEffect::new);
+        register("platereverb", PlateReverbEffect::new);
+        register("roomreverb", RoomReverbEffect::new);
+        register("stereoimagereverb", StereoImageReverbEffect::new);
 
         // Modulation
         register("chorus", ChorusEffect::new);
@@ -107,17 +111,22 @@ public class EffectFactory {
         register("envelopefilter", EnvelopeFilterEffect::new);
         register("talkbox", TalkBoxEffect::new);
         register("synth", SynthEffect::new);
+        register("synthdrone", SynthDroneEffect::new);
+        register("pitchsynth", PitchSynthEffect::new);
+        register("acousticsim", AcousticSimEffect::new);
 
         // Pitch (Phase 9)
         register("pitchshift", PitchShifterEffect::new);
         register("octaver", OctaverEffect::new);
         register("harmonizer", HarmonizerEffect::new);
+        register("autotuner", AutoTunerEffect::new);
 
         // Utility
         register("splitter", SplitterEffect::new);
         register("mixer", MixerEffect::new);
         register("mono2stereo", MonoToStereoEffect::new);
         register("looper", LooperEffect::new);
+        register("settings", SettingsEffect::new);
     }
 
     /**

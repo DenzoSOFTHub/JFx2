@@ -18,20 +18,20 @@ public class CanvasController {
     // ==================== SIGNAL FLOW ANALYZER ====================
     private final SignalFlowAnalyzer signalFlowAnalyzer = new SignalFlowAnalyzer();
 
-    // ==================== BLOCK DIMENSIONS ====================
-    public static final int BLOCK_WIDTH = 140;
-    public static final int BLOCK_HEIGHT = 80;
-    public static final int BLOCK_HEIGHT_MIN = 80;
-    public static final int BLOCK_HEIGHT_PER_PORT = 20;
-    public static final int BLOCK_HEADER_HEIGHT = 24;
-    public static final int BLOCK_CORNER_RADIUS = 8;
-    public static final int PORT_RADIUS = 6;
-    public static final int PORT_SPACING = 20;
+    // ==================== BLOCK DIMENSIONS (Pedal-style 1:2 ratio) ====================
+    public static final int BLOCK_WIDTH = 90;
+    public static final int BLOCK_HEIGHT = 180;
+    public static final int BLOCK_HEIGHT_MIN = 180;
+    public static final int BLOCK_HEIGHT_PER_PORT = 24;
+    public static final int BLOCK_HEADER_HEIGHT = 28;
+    public static final int BLOCK_CORNER_RADIUS = 10;
+    public static final int PORT_RADIUS = 7;
+    public static final int PORT_SPACING = 24;
 
     // ==================== LAYOUT CONSTANTS ====================
-    public static final int LAYOUT_MARGIN = 100;
-    public static final int LAYOUT_H_SPACING = 180;
-    public static final int LAYOUT_V_SPACING = 120;
+    public static final int LAYOUT_MARGIN = 80;
+    public static final int LAYOUT_H_SPACING = 120;
+    public static final int LAYOUT_V_SPACING = 200;
 
     // ==================== MODEL ====================
     private SignalGraph signalGraph;
@@ -462,6 +462,35 @@ public class CanvasController {
             }
         }
         return null;
+    }
+
+    /**
+     * Check if a point is on the footswitch area of a node.
+     * Used for click-to-toggle-bypass functionality.
+     *
+     * @param node The node to check
+     * @param x    X coordinate in world space
+     * @param y    Y coordinate in world space
+     * @return true if the point is within the footswitch hit area
+     */
+    public boolean isPointOnFootswitch(ProcessingNode node, int x, int y) {
+        if (node == null) return false;
+
+        Point pos = getNodePosition(node.getId());
+        int nodeHeight = getBlockHeight(node);
+
+        // Footswitch dimensions (must match BlockRenderer)
+        int switchSize = 28;
+        int bezelSize = switchSize + 8;  // Include bezel for easier clicking
+        int pedalBevel = 3;
+
+        // Calculate footswitch hit area (centered horizontally, near bottom)
+        int hitX = pos.x + (BLOCK_WIDTH - bezelSize) / 2;
+        int hitY = pos.y + nodeHeight - bezelSize - 10 - pedalBevel;
+        int hitW = bezelSize;
+        int hitH = bezelSize;
+
+        return x >= hitX && x <= hitX + hitW && y >= hitY && y <= hitY + hitH;
     }
 
     /**

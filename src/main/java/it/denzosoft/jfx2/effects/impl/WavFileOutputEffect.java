@@ -34,13 +34,14 @@ public class WavFileOutputEffect extends AbstractEffect {
 
     private static final DateTimeFormatter TIMESTAMP_FORMAT =
             DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
+    private static final String WAV_OUTPUT_DIR = "./wav-output/";
 
     // Parameters
     private final Parameter recordingParam;
 
     // Recording state
-    private String outputDirectory = System.getProperty("user.home");
-    private String baseFileName = "recording";
+    private String outputDirectory = WAV_OUTPUT_DIR;
+    private String rigName = "recording";
     private volatile boolean isRecording;
     private List<float[]> recordedBuffersL;  // Left channel (or mono)
     private List<float[]> recordedBuffersR;  // Right channel (null for mono)
@@ -150,17 +151,17 @@ public class WavFileOutputEffect extends AbstractEffect {
     }
 
     /**
-     * Set the base file name (without timestamp or extension).
+     * Set the rig name (used in filename).
      */
-    public void setBaseFileName(String name) {
-        this.baseFileName = name;
+    public void setRigName(String name) {
+        this.rigName = name != null && !name.isEmpty() ? name : "recording";
     }
 
     /**
-     * Get the base file name.
+     * Get the rig name.
      */
-    public String getBaseFileName() {
-        return baseFileName;
+    public String getRigName() {
+        return rigName;
     }
 
     /**
@@ -181,9 +182,10 @@ public class WavFileOutputEffect extends AbstractEffect {
             return;
         }
 
-        // Generate filename with timestamp
+        // Generate filename with rig name and timestamp: <rigName>-yyyyMMddHHmmss.wav
         String timestamp = LocalDateTime.now().format(TIMESTAMP_FORMAT);
-        String fileName = baseFileName + "_" + timestamp + ".wav";
+        String safeRigName = rigName.replaceAll("[^a-zA-Z0-9_-]", "_");
+        String fileName = safeRigName + "-" + timestamp + ".wav";
         currentRecordingPath = dirPath.resolve(fileName).toString();
 
         // Initialize recording buffers

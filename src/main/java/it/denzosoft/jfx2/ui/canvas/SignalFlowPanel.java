@@ -98,8 +98,41 @@ public class SignalFlowPanel extends JPanel {
         // Setup drag & drop handler
         new CanvasDropHandler(this);
 
+        // Enable tooltips for blocks
+        ToolTipManager.sharedInstance().registerComponent(this);
+        ToolTipManager.sharedInstance().setInitialDelay(500);
+        ToolTipManager.sharedInstance().setDismissDelay(10000);
+
         // Center the view initially
         SwingUtilities.invokeLater(this::centerView);
+    }
+
+    @Override
+    public String getToolTipText(MouseEvent e) {
+        Point2D worldPoint = screenToWorld(e.getX(), e.getY());
+        int wx = (int) worldPoint.getX();
+        int wy = (int) worldPoint.getY();
+
+        // Check if hovering over a node
+        ProcessingNode node = controller.getNodeAt(wx, wy);
+        if (node != null) {
+            // Build tooltip with effect info
+            if (node instanceof EffectNode effectNode) {
+                var effect = effectNode.getEffect();
+                if (effect != null && effect.getMetadata() != null) {
+                    var meta = effect.getMetadata();
+                    String status = node.isBypassed() ? " [BYPASS]" : "";
+                    return "<html><b>" + meta.name() + "</b>" + status + "<br>" +
+                           "<i>" + meta.category().getDisplayName() + "</i><br>" +
+                           meta.description() + "</html>";
+                }
+            }
+            // For non-effect nodes (Input, Output, etc.)
+            return "<html><b>" + node.getName() + "</b><br>" +
+                   node.getNodeType().name() + "</html>";
+        }
+
+        return null;  // No tooltip
     }
 
     // ==================== PAINTING ====================
@@ -504,6 +537,26 @@ public class SignalFlowPanel extends JPanel {
                             }
                             isDraggingSelection = true;
                         }
+                    }
+                }
+            }
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                // Single click on footswitch toggles bypass
+                if (e.getClickCount() == 1 && SwingUtilities.isLeftMouseButton(e)) {
+                    Point2D worldPoint = screenToWorld(e.getX(), e.getY());
+                    int wx = (int) worldPoint.getX();
+                    int wy = (int) worldPoint.getY();
+
+                    // Check if clicked on a node's footswitch
+                    ProcessingNode clickedNode = controller.getNodeAt(wx, wy);
+                    if (clickedNode != null && controller.isPointOnFootswitch(clickedNode, wx, wy)) {
+                        // Toggle bypass state
+                        clickedNode.setBypassed(!clickedNode.isBypassed());
+                        repaint();
+                        // Notify listeners of bypass change
+                        firePropertyChange("bypassToggled", null, clickedNode);
                     }
                 }
             }

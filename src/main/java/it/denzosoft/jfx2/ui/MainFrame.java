@@ -134,6 +134,11 @@ public class MainFrame extends JFrame {
         canvasPanel.addPropertyChangeListener("connectionCreated", e -> markModified());
         canvasPanel.addPropertyChangeListener("nodesDeleted", e -> markModified());
         canvasPanel.addPropertyChangeListener("bypassChanged", e -> markModified());
+        canvasPanel.addPropertyChangeListener("bypassToggled", e -> {
+            // Update parameter panel's bypass toggle when bypass is changed via double-click
+            parameterPanel.updateBypassState();
+            markModified();
+        });
         canvasPanel.addPropertyChangeListener("nodesDuplicated", e -> markModified());
 
         // ==================== WEST: Effect Palette + Minimap ====================
