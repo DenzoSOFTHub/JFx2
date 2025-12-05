@@ -1,6 +1,7 @@
 package it.denzosoft.jfx2;
 
 import it.denzosoft.jfx2.cli.JFx2Cli;
+import it.denzosoft.jfx2.effects.plugin.PluginLoader;
 import it.denzosoft.jfx2.ui.MainFrame;
 
 /**
@@ -11,7 +12,12 @@ import it.denzosoft.jfx2.ui.MainFrame;
  */
 public class JFx2 {
 
+    private static final PluginLoader pluginLoader = new PluginLoader();
+
     public static void main(String[] args) {
+        // Load plugins from plugins/ directory
+        loadPlugins();
+
         // Check for CLI mode flags
         if (args.length > 0) {
             String flag = args[0];
@@ -70,5 +76,28 @@ public class JFx2 {
         System.out.println("  --test-tools        Test tuner/metronome/recorder");
         System.out.println("  --generate-factory  Generate factory presets");
         System.out.println("  --help, -h          Show this help");
+    }
+
+    /**
+     * Load effect plugins from the plugins/ directory.
+     */
+    private static void loadPlugins() {
+        try {
+            int effectCount = pluginLoader.loadPlugins();
+            if (effectCount > 0) {
+                System.out.println("Loaded " + effectCount + " effect(s) from plugins");
+            }
+        } catch (Exception e) {
+            System.err.println("Error loading plugins: " + e.getMessage());
+        }
+    }
+
+    /**
+     * Get the plugin loader instance.
+     *
+     * @return Plugin loader
+     */
+    public static PluginLoader getPluginLoader() {
+        return pluginLoader;
     }
 }

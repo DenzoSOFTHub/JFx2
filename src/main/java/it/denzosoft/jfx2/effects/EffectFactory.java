@@ -2,6 +2,7 @@ package it.denzosoft.jfx2.effects;
 
 import it.denzosoft.jfx2.effects.impl.*;
 import it.denzosoft.jfx2.effects.impl.drums.DrumMachine;
+import it.denzosoft.jfx2.effects.acoustic.*;
 
 import java.util.*;
 import java.util.function.Supplier;
@@ -96,6 +97,7 @@ public class EffectFactory {
         register("filter", FilterEffect::new);
         register("parametriceq", ParametricEQEffect::new);
         register("graphiceq", GraphicEQEffect::new);
+        register("pickupemu", PickupEmulatorEffect::new);
 
         // Amp Simulation (Phase 8)
         register("amp", AmpEffect::new);
@@ -121,6 +123,14 @@ public class EffectFactory {
         register("octaver", OctaverEffect::new);
         register("harmonizer", HarmonizerEffect::new);
         register("autotuner", AutoTunerEffect::new);
+
+        // Acoustic
+        register("bodyresonance", BodyResonanceEffect::new);
+        register("antifeedback", AntiFeedbackEffect::new);
+        register("12string", TwelveStringSimulatorEffect::new);
+        register("piezosweetener", PiezoSweetenerEffect::new);
+        register("acousticcomp", AcousticCompressorEffect::new);
+        register("acousticeq", AcousticEQEffect::new);
 
         // Utility
         register("splitter", SplitterEffect::new);

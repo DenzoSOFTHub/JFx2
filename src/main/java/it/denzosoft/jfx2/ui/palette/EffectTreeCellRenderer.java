@@ -98,6 +98,7 @@ public class EffectTreeCellRenderer extends DefaultTreeCellRenderer {
             case FILTER -> "eq";
             case AMP_SIM -> "drive";
             case PITCH -> "pitch";
+            case ACOUSTIC -> "eq";
             case UTILITY -> "utility";
         };
         return IconFactory.getIcon(iconName, ICON_SIZE);

@@ -16,6 +16,7 @@ public enum EffectCategory {
     FILTER("Filter", "Wah, Auto-wah, Envelope filters"),
     AMP_SIM("Amp Simulation", "Amp models, Cabinet simulation"),
     PITCH("Pitch", "Pitch shifter, Octaver, Harmonizer"),
+    ACOUSTIC("Acoustic", "Acoustic guitar processing, Body simulation, Anti-feedback"),
     UTILITY("Utility", "Splitter, Mixer, Volume");
 
     private final String displayName;

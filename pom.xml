@@ -79,7 +79,7 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>3.3.0</version>
                 <configuration>
-                    <finalName>${project.artifactId}-2.0.${build.number}</finalName>
+                    <finalName>${project.artifactId}</finalName>
                     <archive>
                         <manifest>
                             <mainClass>${exec.mainClass}</mainClass>
