@@ -6,8 +6,7 @@ package it.denzosoft.jfx2.effects;
 public enum EffectCategory {
     INPUT_SOURCE("Input Source", "Audio generators and file players"),
     OUTPUT_SINK("Output", "Audio recorders and file writers"),
-    DYNAMICS("Dynamics", "Compressor, Gate, Limiter"),
-    GAIN("Gain", "Volume, Boost, Gain stages"),
+    DYNAMICS("Dynamics", "Compressor, Gate, Limiter, Gain"),
     DISTORTION("Distortion", "Overdrive, Distortion, Fuzz"),
     MODULATION("Modulation", "Chorus, Phaser, Tremolo, Flanger"),
     DELAY("Delay", "Delay, Echo"),

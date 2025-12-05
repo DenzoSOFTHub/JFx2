@@ -74,7 +74,9 @@ public class EffectTreeCellRenderer extends DefaultTreeCellRenderer {
     private void renderEffect(EffectMetadata metadata, boolean selected) {
         Icon icon = getEffectIcon(metadata);
         setText("  " + metadata.name());
-        setFont(DarkTheme.FONT_REGULAR);
+        // Use bold font for plugin effects (author != "JFx2")
+        boolean isPlugin = !"JFx2".equals(metadata.author());
+        setFont(isPlugin ? DarkTheme.FONT_BOLD : DarkTheme.FONT_REGULAR);
         setForeground(selected ? DarkTheme.TEXT_PRIMARY : DarkTheme.TEXT_SECONDARY);
         setToolTipText(metadata.description());
         setIcon(icon);
@@ -83,22 +85,22 @@ public class EffectTreeCellRenderer extends DefaultTreeCellRenderer {
 
     /**
      * Get icon for a category.
+     * Each category has its own unique icon with matching color.
      */
     private Icon getCategoryIcon(EffectCategory category) {
         String iconName = switch (category) {
             case INPUT_SOURCE -> "input_source";
             case OUTPUT_SINK -> "output_sink";
             case DYNAMICS -> "dynamics";
-            case GAIN -> "dynamics";
-            case DISTORTION -> "drive";
+            case DISTORTION -> "distortion";
             case MODULATION -> "modulation";
-            case DELAY -> "time";
-            case REVERB -> "time";
+            case DELAY -> "delay";
+            case REVERB -> "reverb";
             case EQ -> "eq";
-            case FILTER -> "eq";
-            case AMP_SIM -> "drive";
+            case FILTER -> "filter";
+            case AMP_SIM -> "amp_sim";
             case PITCH -> "pitch";
-            case ACOUSTIC -> "eq";
+            case ACOUSTIC -> "acoustic";
             case UTILITY -> "utility";
         };
         return IconFactory.getIcon(iconName, ICON_SIZE);

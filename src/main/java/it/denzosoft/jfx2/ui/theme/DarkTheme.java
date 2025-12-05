@@ -104,15 +104,20 @@ public final class DarkTheme {
     public static final Font FONT_MONO = new Font("Consolas", Font.PLAIN, 12);
 
     // ==================== CATEGORY COLORS (for effect blocks) ====================
-    public static final Color CATEGORY_DYNAMICS = new Color(0x9c27b0);
-    public static final Color CATEGORY_DRIVE = new Color(0xf44336);
-    public static final Color CATEGORY_MODULATION = new Color(0x2196f3);
-    public static final Color CATEGORY_TIME = new Color(0x00bcd4);
-    public static final Color CATEGORY_EQ = new Color(0x4caf50);
-    public static final Color CATEGORY_PITCH = new Color(0xff9800);
-    public static final Color CATEGORY_UTILITY = new Color(0x607d8b);
-    public static final Color CATEGORY_INPUT = new Color(0x8bc34a);
-    public static final Color CATEGORY_OUTPUT = new Color(0xff5722);
+    // Each of the 13 effect categories has a unique color
+    public static final Color CATEGORY_INPUT_SOURCE = new Color(0x8bc34a);  // Light green
+    public static final Color CATEGORY_OUTPUT_SINK = new Color(0xff5722);   // Deep orange
+    public static final Color CATEGORY_DYNAMICS = new Color(0x9c27b0);      // Purple
+    public static final Color CATEGORY_DISTORTION = new Color(0xf44336);    // Red
+    public static final Color CATEGORY_MODULATION = new Color(0x2196f3);    // Blue
+    public static final Color CATEGORY_DELAY = new Color(0x00bcd4);         // Cyan
+    public static final Color CATEGORY_REVERB = new Color(0x009688);        // Teal
+    public static final Color CATEGORY_EQ = new Color(0x4caf50);            // Green
+    public static final Color CATEGORY_FILTER = new Color(0x26a69a);        // Teal variant
+    public static final Color CATEGORY_AMP_SIM = new Color(0xffc107);       // Amber
+    public static final Color CATEGORY_PITCH = new Color(0xff9800);         // Orange
+    public static final Color CATEGORY_ACOUSTIC = new Color(0x795548);      // Brown
+    public static final Color CATEGORY_UTILITY = new Color(0x607d8b);       // Blue-grey
 
     private DarkTheme() {
         // Utility class
@@ -333,21 +338,25 @@ public final class DarkTheme {
 
     /**
      * Get a color for an effect category.
+     * Accepts EffectCategory.name() values (e.g., "INPUT_SOURCE", "DYNAMICS").
      */
     public static Color getCategoryColor(String category) {
         if (category == null) return CATEGORY_UTILITY;
 
-        return switch (category.toLowerCase()) {
-            case "input_source" -> ACCENT_PRIMARY;
-            case "output_sink" -> CATEGORY_OUTPUT;
-            case "dynamics", "gain" -> CATEGORY_DYNAMICS;
-            case "drive", "distortion" -> CATEGORY_DRIVE;
-            case "modulation" -> CATEGORY_MODULATION;
-            case "time", "delay", "reverb" -> CATEGORY_TIME;
-            case "eq", "filter" -> CATEGORY_EQ;
-            case "pitch" -> CATEGORY_PITCH;
-            case "input" -> CATEGORY_INPUT;
-            case "output" -> CATEGORY_OUTPUT;
+        return switch (category.toUpperCase()) {
+            case "INPUT_SOURCE" -> CATEGORY_INPUT_SOURCE;
+            case "OUTPUT_SINK" -> CATEGORY_OUTPUT_SINK;
+            case "DYNAMICS" -> CATEGORY_DYNAMICS;
+            case "DISTORTION" -> CATEGORY_DISTORTION;
+            case "MODULATION" -> CATEGORY_MODULATION;
+            case "DELAY" -> CATEGORY_DELAY;
+            case "REVERB" -> CATEGORY_REVERB;
+            case "EQ" -> CATEGORY_EQ;
+            case "FILTER" -> CATEGORY_FILTER;
+            case "AMP_SIM" -> CATEGORY_AMP_SIM;
+            case "PITCH" -> CATEGORY_PITCH;
+            case "ACOUSTIC" -> CATEGORY_ACOUSTIC;
+            case "UTILITY" -> CATEGORY_UTILITY;
             default -> CATEGORY_UTILITY;
         };
     }

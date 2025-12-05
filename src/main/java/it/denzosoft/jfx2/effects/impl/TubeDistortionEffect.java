@@ -411,7 +411,7 @@ public class TubeDistortionEffect extends AbstractEffect {
 
     @Override
     public int[] getParameterRowSizes() {
-        // All parameters on one row: tube, stages, drive, bias, sag, tone, output, mix
-        return new int[] {8};
+        // All 9 parameters on one row: Stereo, Tube, Stages, Drive, Bias, Sag, Tone, Output, Mix
+        return new int[] {9};
     }
 }

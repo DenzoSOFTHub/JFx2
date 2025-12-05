@@ -12,11 +12,29 @@ import java.util.Map;
 /**
  * Factory for generating icons programmatically using Java2D.
  * No external files needed - all icons are drawn at runtime.
+ *
+ * <p>Plugins can register custom effect icon painters via {@link #registerEffectIconPainter}.</p>
  */
 public class IconFactory {
 
     private static final int DEFAULT_SIZE = 16;
     private static final Map<String, Icon> iconCache = new HashMap<>();
+    private static final Map<String, EffectIconPainter> customPainters = new HashMap<>();
+
+    /**
+     * Functional interface for custom effect icon painters.
+     * Plugins can implement this to provide custom icons for their effects.
+     */
+    @FunctionalInterface
+    public interface EffectIconPainter {
+        /**
+         * Draw the effect icon.
+         * @param g Graphics2D context (already configured with antialiasing)
+         * @param size Icon size in pixels
+         * @param color Category color to use
+         */
+        void paint(Graphics2D g, int size, Color color);
+    }
 
     // ==================== PUBLIC API ====================
 
@@ -42,10 +60,52 @@ public class IconFactory {
         return iconCache.computeIfAbsent(key, k -> createEffectIcon(effectId, categoryColor, size));
     }
 
+    /**
+     * Register a custom icon painter for an effect.
+     * Plugins can use this to provide custom icons for their effects.
+     *
+     * @param effectId The effect identifier (must match the effect's ID)
+     * @param painter  The painter that will draw the icon
+     */
+    public static void registerEffectIconPainter(String effectId, EffectIconPainter painter) {
+        customPainters.put(effectId.toLowerCase(), painter);
+        // Clear any cached icons for this effect
+        iconCache.entrySet().removeIf(e -> e.getKey().startsWith("effect_" + effectId.toLowerCase() + "_"));
+    }
+
+    /**
+     * Register multiple icon painters at once.
+     *
+     * @param painters Map of effect IDs to painters
+     */
+    public static void registerEffectIconPainters(Map<String, EffectIconPainter> painters) {
+        painters.forEach(IconFactory::registerEffectIconPainter);
+    }
+
+    /**
+     * Unregister all custom painters (useful for plugin unload).
+     *
+     * @param effectIds The effect IDs to unregister
+     */
+    public static void unregisterEffectIconPainters(Iterable<String> effectIds) {
+        for (String id : effectIds) {
+            customPainters.remove(id.toLowerCase());
+            iconCache.entrySet().removeIf(e -> e.getKey().startsWith("effect_" + id.toLowerCase() + "_"));
+        }
+    }
+
     private static Icon createEffectIcon(String effectId, Color color, int size) {
         BufferedImage image = new BufferedImage(size, size, BufferedImage.TYPE_INT_ARGB);
         Graphics2D g2d = image.createGraphics();
         setupGraphics(g2d);
+
+        // Check for custom painter first (from plugins)
+        EffectIconPainter customPainter = customPainters.get(effectId.toLowerCase());
+        if (customPainter != null) {
+            customPainter.paint(g2d, size, color);
+            g2d.dispose();
+            return new ImageIcon(image);
+        }
 
         switch (effectId.toLowerCase()) {
             // Input Sources
@@ -119,6 +179,57 @@ public class IconFactory {
             case "splitter" -> drawSplitterEffectIcon(g2d, size, color);
             case "mixer" -> drawMixerEffectIcon(g2d, size, color);
             case "mono2stereo" -> drawMono2StereoIcon(g2d, size, color);
+            case "stereo2mono" -> drawStereo2MonoIcon(g2d, size, color);
+            case "looper" -> drawLooperIcon(g2d, size, color);
+            case "settings" -> drawSettingsEffectIcon(g2d, size, color);
+
+            // Output - additional
+            case "midirecorder" -> drawMidiRecorderIcon(g2d, size, color);
+
+            // Dynamics - additional
+            case "noisesuppressor" -> drawNoiseSuppressorIcon(g2d, size, color);
+            case "multibandcomp" -> drawMultibandCompIcon(g2d, size, color);
+            case "autosustain" -> drawAutoSustainIcon(g2d, size, color);
+
+            // Distortion - additional
+            case "tubedist" -> drawTubeDistortionIcon(g2d, size, color);
+
+            // Delay - additional
+            case "quaddelay" -> drawQuadDelayIcon(g2d, size, color);
+
+            // Reverb - additional
+            case "platereverb" -> drawPlateReverbIcon(g2d, size, color);
+            case "roomreverb" -> drawRoomReverbIcon(g2d, size, color);
+            case "stereoimagereverb" -> drawStereoImageReverbIcon(g2d, size, color);
+
+            // Modulation - additional
+            case "pan3d" -> drawPan3DIcon(g2d, size, color);
+
+            // EQ - additional
+            case "pickupemu" -> drawPickupEmulatorIcon(g2d, size, color);
+
+            // Amp Sim - additional
+            case "neuralamp", "nam" -> drawNeuralAmpIcon(g2d, size, color);
+            case "tubepreamp" -> drawTubePreampIcon(g2d, size, color);
+            case "tubepoweramp" -> drawTubePowerAmpIcon(g2d, size, color);
+            case "cabinetsim" -> drawCabinetSimulatorIcon(g2d, size, color);
+
+            // Filter/Synth - additional
+            case "synthdrone" -> drawSynthDroneIcon(g2d, size, color);
+            case "pitchsynth" -> drawPitchSynthIcon(g2d, size, color);
+            case "acousticsim" -> drawAcousticSimIcon(g2d, size, color);
+
+            // Pitch - additional
+            case "harmonizer" -> drawHarmonizerIcon(g2d, size, color);
+            case "autotuner" -> drawAutoTunerIcon(g2d, size, color);
+
+            // Acoustic
+            case "bodyresonance" -> drawBodyResonanceIcon(g2d, size, color);
+            case "antifeedback" -> drawAntiFeedbackIcon(g2d, size, color);
+            case "12string" -> drawTwelveStringIcon(g2d, size, color);
+            case "piezosweetener" -> drawPiezoSweetenerIcon(g2d, size, color);
+            case "acousticcomp" -> drawAcousticCompressorIcon(g2d, size, color);
+            case "acousticeq" -> drawAcousticEQIcon(g2d, size, color);
 
             default -> drawDefaultEffectIcon(g2d, size, color);
         }
@@ -180,11 +291,17 @@ public class IconFactory {
             case "output_sink" -> drawOutputSinkIcon(g2d, size);
             case "wav_recorder" -> drawWavRecorderIcon(g2d, size);
             case "dynamics" -> drawDynamicsIcon(g2d, size);
+            case "distortion" -> drawDistortionCategoryIcon(g2d, size);
             case "drive" -> drawDriveIcon(g2d, size);
             case "modulation" -> drawModulationIcon(g2d, size);
+            case "delay" -> drawDelayCategoryIcon(g2d, size);
+            case "reverb" -> drawReverbCategoryIcon(g2d, size);
             case "time" -> drawTimeIcon(g2d, size);
             case "eq" -> drawEQIcon(g2d, size);
+            case "filter" -> drawFilterCategoryIcon(g2d, size);
+            case "amp_sim" -> drawAmpSimCategoryIcon(g2d, size);
             case "pitch" -> drawPitchIcon(g2d, size);
+            case "acoustic" -> drawAcousticCategoryIcon(g2d, size);
             case "utility" -> drawUtilityIcon(g2d, size);
             case "effect" -> drawEffectIcon(g2d, size);
             case "splitter" -> drawSplitterIcon(g2d, size);
@@ -292,39 +409,51 @@ public class IconFactory {
     // ==================== EDIT ICONS ====================
 
     private static void drawUndoIcon(Graphics2D g, int size) {
-        int m = size / 6;
-        int arrowSize = size / 4;
+        int m = size / 5;
+        int cx = size / 2;
+        int cy = size / 2;
+        int radius = size / 3;
 
         g.setColor(DarkTheme.TEXT_PRIMARY);
-        g.setStroke(new BasicStroke(1.8f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g.setStroke(new BasicStroke(2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
-        // Curved arrow
-        Arc2D arc = new Arc2D.Double(m, m + size / 4, size - m * 2, size / 2, 45, 180, Arc2D.OPEN);
+        // Counter-clockwise curved arrow (270° arc starting from right)
+        Arc2D arc = new Arc2D.Double(cx - radius, cy - radius + 2, radius * 2, radius * 2, -30, 250, Arc2D.OPEN);
         g.draw(arc);
 
-        // Arrow head
-        int ax = m + arrowSize / 2;
-        int ay = m + size / 4;
-        g.drawLine(ax, ay, ax + arrowSize, ay - arrowSize / 2);
-        g.drawLine(ax, ay, ax + arrowSize, ay + arrowSize / 2);
+        // Arrow head pointing left at the end of arc
+        int ax = m + 1;
+        int ay = cy + 2;
+        int ah = size / 5;
+        Path2D arrow = new Path2D.Double();
+        arrow.moveTo(ax + ah, ay - ah);
+        arrow.lineTo(ax, ay);
+        arrow.lineTo(ax + ah, ay + ah);
+        g.draw(arrow);
     }
 
     private static void drawRedoIcon(Graphics2D g, int size) {
-        int m = size / 6;
-        int arrowSize = size / 4;
+        int m = size / 5;
+        int cx = size / 2;
+        int cy = size / 2;
+        int radius = size / 3;
 
         g.setColor(DarkTheme.TEXT_PRIMARY);
-        g.setStroke(new BasicStroke(1.8f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g.setStroke(new BasicStroke(2.0f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
-        // Curved arrow (mirrored)
-        Arc2D arc = new Arc2D.Double(m, m + size / 4, size - m * 2, size / 2, 135, -180, Arc2D.OPEN);
+        // Clockwise curved arrow (270° arc starting from left)
+        Arc2D arc = new Arc2D.Double(cx - radius, cy - radius + 2, radius * 2, radius * 2, 210, -250, Arc2D.OPEN);
         g.draw(arc);
 
-        // Arrow head
-        int ax = size - m - arrowSize / 2;
-        int ay = m + size / 4;
-        g.drawLine(ax, ay, ax - arrowSize, ay - arrowSize / 2);
-        g.drawLine(ax, ay, ax - arrowSize, ay + arrowSize / 2);
+        // Arrow head pointing right at the end of arc
+        int ax = size - m - 1;
+        int ay = cy + 2;
+        int ah = size / 5;
+        Path2D arrow = new Path2D.Double();
+        arrow.moveTo(ax - ah, ay - ah);
+        arrow.lineTo(ax, ay);
+        arrow.lineTo(ax - ah, ay + ah);
+        g.draw(arrow);
     }
 
     private static void drawCutIcon(Graphics2D g, int size) {
@@ -570,19 +699,19 @@ public class IconFactory {
         int m = size / 4;
         int[] xPoints = {m, size - m, m};
         int[] yPoints = {m, size / 2, size - m};
-        g.setColor(DarkTheme.CATEGORY_INPUT);
+        g.setColor(DarkTheme.CATEGORY_INPUT_SOURCE);
         g.fillPolygon(xPoints, yPoints, 3);
     }
 
     private static void drawOutputIcon(Graphics2D g, int size) {
         int m = size / 4;
-        g.setColor(DarkTheme.CATEGORY_OUTPUT);
+        g.setColor(DarkTheme.CATEGORY_OUTPUT_SINK);
         g.fillRect(m, m, size - m * 2, size - m * 2);
     }
 
     private static void drawInputSourceIcon(Graphics2D g, int size) {
         int m = size / 5;
-        g.setColor(DarkTheme.ACCENT_PRIMARY);
+        g.setColor(DarkTheme.CATEGORY_INPUT_SOURCE);
 
         // Speaker/audio source icon
         g.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
@@ -652,7 +781,7 @@ public class IconFactory {
 
     private static void drawOutputSinkIcon(Graphics2D g, int size) {
         int m = size / 6;
-        g.setColor(DarkTheme.CATEGORY_OUTPUT);
+        g.setColor(DarkTheme.CATEGORY_OUTPUT_SINK);
         g.setStroke(new BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
 
         // Arrow pointing into disk
@@ -724,7 +853,7 @@ public class IconFactory {
         bolt.lineTo(size * 0.5, size * 0.5);
         bolt.closePath();
 
-        g.setColor(DarkTheme.CATEGORY_DRIVE);
+        g.setColor(DarkTheme.CATEGORY_DISTORTION);
         g.fill(bolt);
     }
 
@@ -749,7 +878,7 @@ public class IconFactory {
         int cx = size / 2;
         int cy = size / 2;
 
-        g.setColor(DarkTheme.CATEGORY_TIME);
+        g.setColor(DarkTheme.CATEGORY_DELAY);
         g.setStroke(new BasicStroke(1.5f));
         g.drawOval(m, m, size - m * 2, size - m * 2);
 
@@ -811,6 +940,111 @@ public class IconFactory {
         g.drawLine(m, m, size / 2, size / 2);
         g.drawLine(m, size - m, size / 2, size / 2);
         g.drawLine(size / 2, size / 2, size - m, size / 2);
+    }
+
+    // ==================== CATEGORY ICONS (with unique colors) ====================
+
+    private static void drawDistortionCategoryIcon(Graphics2D g, int size) {
+        g.setColor(DarkTheme.CATEGORY_DISTORTION);
+        g.setStroke(new BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+
+        // Lightning bolt (distortion symbol)
+        Path2D bolt = new Path2D.Double();
+        bolt.moveTo(size * 0.5, size * 0.1);
+        bolt.lineTo(size * 0.3, size * 0.5);
+        bolt.lineTo(size * 0.5, size * 0.5);
+        bolt.lineTo(size * 0.4, size * 0.9);
+        bolt.lineTo(size * 0.7, size * 0.5);
+        bolt.lineTo(size * 0.5, size * 0.5);
+        bolt.closePath();
+        g.fill(bolt);
+    }
+
+    private static void drawDelayCategoryIcon(Graphics2D g, int size) {
+        int m = size / 5;
+        g.setColor(DarkTheme.CATEGORY_DELAY);
+        g.setStroke(new BasicStroke(1.5f));
+
+        // Clock with echo
+        g.drawOval(m, m, size - m * 2, size - m * 2);
+        int cx = size / 2;
+        int cy = size / 2;
+        g.drawLine(cx, cy, cx, m + 3);
+        g.drawLine(cx, cy, cx + size / 5, cy + size / 6);
+
+        // Echo lines
+        g.setStroke(new BasicStroke(1f));
+        g.drawArc(size - m - 4, m + 2, 6, size / 2, -60, 120);
+    }
+
+    private static void drawReverbCategoryIcon(Graphics2D g, int size) {
+        int m = size / 5;
+        int cx = size / 2;
+        int cy = size / 2;
+        g.setColor(DarkTheme.CATEGORY_REVERB);
+        g.setStroke(new BasicStroke(1.5f));
+
+        // Expanding sound waves
+        for (int i = 0; i < 3; i++) {
+            int r = 3 + i * 4;
+            int alpha = 255 - i * 60;
+            g.setColor(new Color(
+                DarkTheme.CATEGORY_REVERB.getRed(),
+                DarkTheme.CATEGORY_REVERB.getGreen(),
+                DarkTheme.CATEGORY_REVERB.getBlue(), alpha));
+            g.drawArc(cx - r, cy - r, r * 2, r * 2, -45, 90);
+        }
+    }
+
+    private static void drawFilterCategoryIcon(Graphics2D g, int size) {
+        int m = size / 5;
+        g.setColor(DarkTheme.CATEGORY_FILTER);
+        g.setStroke(new BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+
+        // Wah pedal curve
+        Path2D curve = new Path2D.Double();
+        curve.moveTo(m, size * 2 / 3);
+        curve.quadTo(size / 3, m, size / 2, size / 2);
+        curve.quadTo(size * 2 / 3, size - m, size - m, size / 3);
+        g.draw(curve);
+    }
+
+    private static void drawAmpSimCategoryIcon(Graphics2D g, int size) {
+        int m = size / 5;
+        g.setColor(DarkTheme.CATEGORY_AMP_SIM);
+        g.setStroke(new BasicStroke(1.5f));
+
+        // Amp front with speaker
+        g.drawRoundRect(m, m, size - m * 2, size - m * 2, 4, 4);
+
+        // Speaker grill
+        int cx = size / 2;
+        int cy = size / 2 + 2;
+        int r = size / 4;
+        g.drawOval(cx - r, cy - r, r * 2, r * 2);
+        g.fillOval(cx - 2, cy - 2, 4, 4);
+
+        // Control knob on top
+        g.fillOval(size / 2 - 2, m + 2, 4, 4);
+    }
+
+    private static void drawAcousticCategoryIcon(Graphics2D g, int size) {
+        int m = size / 5;
+        g.setColor(DarkTheme.CATEGORY_ACOUSTIC);
+        g.setStroke(new BasicStroke(1.5f));
+
+        // Acoustic guitar body
+        int bodyW = size - m * 2;
+        int bodyH = size - m * 2;
+
+        // Upper bout (smaller)
+        g.drawArc(m + 2, m, bodyW - 4, bodyH / 2, 0, 180);
+
+        // Lower bout (larger)
+        g.drawArc(m, size / 2 - 2, bodyW, bodyH / 2 + 2, 180, 180);
+
+        // Sound hole
+        g.drawOval(size / 2 - 3, size / 2, 6, 6);
     }
 
     // ==================== TREE ICONS ====================
@@ -1576,6 +1810,7 @@ public class IconFactory {
     }
 
     private static void drawShimmerReverbIcon(Graphics2D g, int size, Color color) {
+        int m = size / 5;
         int cx = size / 2;
         int cy = size / 2;
         g.setStroke(new BasicStroke(1.5f));
@@ -1833,5 +2068,656 @@ public class IconFactory {
         g.drawString("R", size - m + 1, size - m + 2);
     }
 
-    private static final int m = 0; // Placeholder for local margin variable
+    // ==================== ADDITIONAL EFFECT ICONS ====================
+
+    // --- Utility ---
+
+    private static void drawStereo2MonoIcon(Graphics2D g, int size, Color color) {
+        int m = size / 5;
+        g.setColor(color);
+        g.setStroke(new BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+
+        // Two inputs merging to one
+        g.drawLine(m, m + 2, size / 2, size / 2);
+        g.drawLine(m, size - m - 2, size / 2, size / 2);
+        g.drawLine(size / 2, size / 2, size - m, size / 2);
+
+        // L and R labels
+        g.setFont(new Font("SansSerif", Font.PLAIN, size / 5));
+        g.drawString("L", m - 2, m + 6);
+        g.drawString("R", m - 2, size - m + 2);
+
+        // Output dot
+        g.fillOval(size - m - 2, size / 2 - 2, 4, 4);
+    }
+
+    private static void drawLooperIcon(Graphics2D g, int size, Color color) {
+        int cx = size / 2;
+        int cy = size / 2;
+        int r = size / 3;
+        g.setColor(color);
+        g.setStroke(new BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+
+        // Circular loop arrow
+        g.drawArc(cx - r, cy - r, r * 2, r * 2, 30, 300);
+
+        // Arrow head
+        int ax = cx + (int)(r * Math.cos(Math.toRadians(30)));
+        int ay = cy - (int)(r * Math.sin(Math.toRadians(30)));
+        g.drawLine(ax, ay, ax - 4, ay - 3);
+        g.drawLine(ax, ay, ax - 1, ay + 5);
+
+        // Record dot in center
+        g.setColor(DarkTheme.ACCENT_ERROR);
+        g.fillOval(cx - 3, cy - 3, 6, 6);
+    }
+
+    private static void drawSettingsEffectIcon(Graphics2D g, int size, Color color) {
+        int cx = size / 2;
+        int cy = size / 2;
+        g.setColor(color);
+        g.setStroke(new BasicStroke(1.5f));
+
+        // Three horizontal sliders
+        int[] positions = {size / 4, size / 2, size * 3 / 4};
+        int[] knobPos = {size / 3, size * 2 / 3, size / 2};
+        for (int i = 0; i < 3; i++) {
+            int y = size / 5 + i * size / 4;
+            g.drawLine(size / 5, y, size - size / 5, y);
+            g.fillOval(knobPos[i] - 2, y - 2, 5, 5);
+        }
+    }
+
+    // --- Output ---
+
+    private static void drawMidiRecorderIcon(Graphics2D g, int size, Color color) {
+        int m = size / 6;
+        g.setColor(color);
+        g.setStroke(new BasicStroke(1.3f));
+
+        // MIDI connector shape (5-pin DIN)
+        g.drawOval(m, m, size - m * 2, size - m * 2);
+
+        // 5 pins
+        int cx = size / 2;
+        int cy = size / 2;
+        int pinR = size / 4;
+        for (int i = 0; i < 5; i++) {
+            double angle = Math.PI / 2 + i * Math.PI / 3;
+            if (i < 5) {
+                int px = (int)(cx + pinR * Math.cos(angle));
+                int py = (int)(cy - pinR * Math.sin(angle));
+                g.fillOval(px - 2, py - 2, 4, 4);
+            }
+        }
+
+        // Record indicator
+        g.setColor(DarkTheme.ACCENT_ERROR);
+        g.fillOval(size - m - 4, size - m - 4, 5, 5);
+    }
+
+    // --- Dynamics ---
+
+    private static void drawNoiseSuppressorIcon(Graphics2D g, int size, Color color) {
+        int m = size / 5;
+        g.setColor(color);
+        g.setStroke(new BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+
+        // Wave being suppressed (small amplitude)
+        Path2D wave = new Path2D.Double();
+        wave.moveTo(m, size / 2);
+        for (int x = m; x <= size - m; x++) {
+            double progress = (double) (x - m) / (size - m * 2);
+            double amp = Math.max(0, Math.sin(progress * Math.PI) - 0.3) * 0.5;
+            double y = size / 2 + Math.sin(progress * Math.PI * 4) * (size / 4) * amp;
+            wave.lineTo(x, y);
+        }
+        g.draw(wave);
+
+        // X mark for suppression
+        g.setStroke(new BasicStroke(1.5f));
+        g.drawLine(size - m - 3, m + 2, size - m + 1, m + 6);
+        g.drawLine(size - m + 1, m + 2, size - m - 3, m + 6);
+    }
+
+    private static void drawMultibandCompIcon(Graphics2D g, int size, Color color) {
+        int m = size / 6;
+        int bandW = (size - m * 2) / 3;
+        g.setColor(color);
+        g.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+
+        // Three bands with different compression curves
+        int[] heights = {size / 2, size / 3, size * 2 / 5};
+        for (int i = 0; i < 3; i++) {
+            int x = m + i * bandW;
+            int h = heights[i];
+            // Compression knee curve
+            g.drawLine(x + 2, size - m, x + bandW / 2, size / 2);
+            g.drawLine(x + bandW / 2, size / 2, x + bandW - 2, size / 2 - h / 3);
+        }
+
+        // Band separators
+        g.setStroke(new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10, new float[]{2, 2}, 0));
+        g.drawLine(m + bandW, m, m + bandW, size - m);
+        g.drawLine(m + bandW * 2, m, m + bandW * 2, size - m);
+    }
+
+    private static void drawAutoSustainIcon(Graphics2D g, int size, Color color) {
+        int m = size / 5;
+        g.setColor(color);
+        g.setStroke(new BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+
+        // Sustaining envelope (flat decay)
+        Path2D env = new Path2D.Double();
+        env.moveTo(m, size - m);
+        env.lineTo(m + 3, m + 2);
+        env.lineTo(size - m - 3, m + 2);
+        env.lineTo(size - m, size / 2);
+        g.draw(env);
+
+        // "A" for auto
+        g.setFont(new Font("SansSerif", Font.BOLD, size / 4));
+        g.drawString("A", size / 2 - 3, size - m + 2);
+    }
+
+    // --- Distortion ---
+
+    private static void drawTubeDistortionIcon(Graphics2D g, int size, Color color) {
+        int m = size / 5;
+        g.setColor(color);
+        g.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+
+        // Tube shape
+        int tubeW = size / 2;
+        int tubeH = size - m * 2;
+        int tubeX = size / 2 - tubeW / 2;
+        g.drawRoundRect(tubeX, m, tubeW, tubeH, 6, 6);
+
+        // Glowing filament
+        g.setColor(new Color(255, 150, 50, 180));
+        g.fillOval(tubeX + 4, m + tubeH / 3, tubeW - 8, tubeH / 3);
+
+        // Distortion waves
+        g.setColor(color);
+        g.setStroke(new BasicStroke(1.2f));
+        g.drawLine(m - 2, size / 2 - 3, tubeX - 2, size / 2 - 3);
+        g.drawLine(m - 2, size / 2 + 3, tubeX - 2, size / 2 + 3);
+    }
+
+    // --- Delay ---
+
+    private static void drawQuadDelayIcon(Graphics2D g, int size, Color color) {
+        int m = size / 6;
+        g.setColor(color);
+
+        // Four delay taps in a grid
+        int tapSize = (size - m * 2 - 2) / 2;
+        for (int row = 0; row < 2; row++) {
+            for (int col = 0; col < 2; col++) {
+                int x = m + col * (tapSize + 2);
+                int y = m + row * (tapSize + 2);
+                int alpha = 255 - (row * 2 + col) * 40;
+                g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), alpha));
+                g.fillRoundRect(x, y, tapSize, tapSize, 3, 3);
+            }
+        }
+    }
+
+    // --- Reverb ---
+
+    private static void drawPlateReverbIcon(Graphics2D g, int size, Color color) {
+        int m = size / 5;
+        g.setColor(color);
+        g.setStroke(new BasicStroke(1.5f));
+
+        // Metal plate (rectangle)
+        g.drawRect(m, m + 2, size - m * 2, size - m * 2 - 4);
+
+        // Vibration lines
+        g.setStroke(new BasicStroke(1f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        for (int i = 0; i < 3; i++) {
+            int y = m + 4 + i * (size - m * 2 - 8) / 3;
+            g.drawLine(m + 3, y, size - m - 3, y);
+        }
+
+        // Corner mounts
+        g.fillOval(m, m, 4, 4);
+        g.fillOval(size - m - 4, m, 4, 4);
+        g.fillOval(m, size - m - 4, 4, 4);
+        g.fillOval(size - m - 4, size - m - 4, 4, 4);
+    }
+
+    private static void drawRoomReverbIcon(Graphics2D g, int size, Color color) {
+        int m = size / 5;
+        g.setColor(color);
+        g.setStroke(new BasicStroke(1.5f));
+
+        // Room shape (3D box perspective)
+        // Back wall
+        g.drawRect(m + 2, m + 2, size - m * 2 - 4, size - m * 2 - 4);
+
+        // Floor lines (perspective)
+        g.drawLine(m, size - m, m + 2, size - m - 2);
+        g.drawLine(size - m, size - m, size - m - 2, size - m - 2);
+
+        // Sound waves in room
+        g.setStroke(new BasicStroke(1f));
+        int cx = size / 2;
+        int cy = size / 2;
+        g.drawArc(cx - 4, cy - 4, 8, 8, 0, 360);
+        g.drawArc(cx - 7, cy - 7, 14, 14, 30, 120);
+    }
+
+    private static void drawStereoImageReverbIcon(Graphics2D g, int size, Color color) {
+        int m = size / 5;
+        g.setColor(color);
+        g.setStroke(new BasicStroke(1.5f));
+
+        // Two speakers with reverb
+        int spkW = size / 4;
+
+        // Left speaker
+        g.drawRect(m, size / 3, spkW, size / 3);
+
+        // Right speaker
+        g.drawRect(size - m - spkW, size / 3, spkW, size / 3);
+
+        // Converging reverb waves
+        g.setStroke(new BasicStroke(1f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        int cx = size / 2;
+        g.drawArc(m + spkW, size / 4, size / 4, size / 2, -60, 120);
+        g.drawArc(size / 2 - size / 8, size / 4, size / 4, size / 2, 120, 120);
+    }
+
+    // --- Modulation ---
+
+    private static void drawPan3DIcon(Graphics2D g, int size, Color color) {
+        int m = size / 5;
+        int cx = size / 2;
+        int cy = size / 2;
+        g.setColor(color);
+        g.setStroke(new BasicStroke(1.5f));
+
+        // 3D sphere (circle with latitude/longitude)
+        g.drawOval(m, m, size - m * 2, size - m * 2);
+
+        // Equator
+        g.drawArc(m, cy - size / 8, size - m * 2, size / 4, 0, 180);
+
+        // Meridian
+        g.drawArc(cx - size / 8, m, size / 4, size - m * 2, 90, 180);
+
+        // Sound source dot
+        g.setColor(DarkTheme.ACCENT_SUCCESS);
+        g.fillOval(cx + size / 5, cy - size / 5, 5, 5);
+    }
+
+    // --- EQ ---
+
+    private static void drawPickupEmulatorIcon(Graphics2D g, int size, Color color) {
+        int m = size / 5;
+        g.setColor(color);
+        g.setStroke(new BasicStroke(1.5f));
+
+        // Pickup shape (humbucker)
+        int pkW = size - m * 2;
+        int pkH = size / 3;
+        g.drawRoundRect(m, size / 2 - pkH / 2, pkW, pkH, 4, 4);
+
+        // Pole pieces (6 dots)
+        int poleSpacing = pkW / 7;
+        for (int i = 0; i < 6; i++) {
+            int x = m + poleSpacing + i * poleSpacing - 2;
+            g.fillOval(x, size / 2 - 2, 4, 4);
+        }
+
+        // Mounting screws
+        g.fillOval(m + 2, size / 2 - pkH / 2 - 3, 3, 3);
+        g.fillOval(size - m - 5, size / 2 - pkH / 2 - 3, 3, 3);
+    }
+
+    // --- Amp Sim ---
+
+    private static void drawNeuralAmpIcon(Graphics2D g, int size, Color color) {
+        int m = size / 5;
+        g.setColor(color);
+        g.setStroke(new BasicStroke(1.5f));
+
+        // Neural network nodes
+        int[] layerX = {m + 2, size / 2, size - m - 2};
+        int[][] nodeY = {
+            {size / 3, size * 2 / 3},
+            {size / 4, size / 2, size * 3 / 4},
+            {size / 3, size * 2 / 3}
+        };
+
+        // Draw connections first
+        g.setStroke(new BasicStroke(0.8f));
+        for (int y1 : nodeY[0]) {
+            for (int y2 : nodeY[1]) {
+                g.drawLine(layerX[0], y1, layerX[1], y2);
+            }
+        }
+        for (int y1 : nodeY[1]) {
+            for (int y2 : nodeY[2]) {
+                g.drawLine(layerX[1], y1, layerX[2], y2);
+            }
+        }
+
+        // Draw nodes
+        g.setColor(color);
+        for (int layer = 0; layer < 3; layer++) {
+            for (int y : nodeY[layer]) {
+                g.fillOval(layerX[layer] - 3, y - 3, 6, 6);
+            }
+        }
+    }
+
+    private static void drawTubePreampIcon(Graphics2D g, int size, Color color) {
+        int m = size / 5;
+        g.setColor(color);
+        g.setStroke(new BasicStroke(1.5f));
+
+        // Small tube
+        int tubeW = size / 3;
+        int tubeH = size / 2;
+        int tubeX = size / 2 - tubeW / 2;
+        g.drawRoundRect(tubeX, m + 2, tubeW, tubeH, 5, 5);
+
+        // Filament glow
+        g.setColor(new Color(255, 200, 100, 150));
+        g.fillOval(tubeX + 3, m + tubeH / 3, tubeW - 6, tubeH / 3);
+
+        // "PRE" label
+        g.setColor(color);
+        g.setFont(new Font("SansSerif", Font.PLAIN, size / 5));
+        g.drawString("PRE", m, size - m);
+    }
+
+    private static void drawTubePowerAmpIcon(Graphics2D g, int size, Color color) {
+        int m = size / 5;
+        g.setColor(color);
+        g.setStroke(new BasicStroke(1.5f));
+
+        // Larger tube
+        int tubeW = size / 2;
+        int tubeH = size / 2;
+        int tubeX = size / 2 - tubeW / 2;
+        g.drawRoundRect(tubeX, m, tubeW, tubeH, 6, 6);
+
+        // Bigger filament glow
+        g.setColor(new Color(255, 150, 50, 180));
+        g.fillOval(tubeX + 4, m + tubeH / 4, tubeW - 8, tubeH / 2);
+
+        // "PWR" label
+        g.setColor(color);
+        g.setFont(new Font("SansSerif", Font.BOLD, size / 5));
+        g.drawString("PWR", m - 2, size - m + 2);
+    }
+
+    private static void drawCabinetSimulatorIcon(Graphics2D g, int size, Color color) {
+        int m = size / 6;
+        g.setColor(color);
+        g.setStroke(new BasicStroke(1.5f));
+
+        // Cabinet front
+        g.drawRoundRect(m, m, size - m * 2, size - m * 2, 4, 4);
+
+        // 2x2 speakers
+        int spkR = (size - m * 2 - 6) / 4;
+        int offset = m + 2;
+        g.drawOval(offset, offset, spkR * 2, spkR * 2);
+        g.drawOval(size - offset - spkR * 2, offset, spkR * 2, spkR * 2);
+        g.drawOval(offset, size - offset - spkR * 2, spkR * 2, spkR * 2);
+        g.drawOval(size - offset - spkR * 2, size - offset - spkR * 2, spkR * 2, spkR * 2);
+
+        // Mic symbol
+        g.setColor(DarkTheme.ACCENT_PRIMARY);
+        g.fillOval(size / 2 - 2, size / 2 - 2, 4, 4);
+    }
+
+    // --- Filter/Synth ---
+
+    private static void drawSynthDroneIcon(Graphics2D g, int size, Color color) {
+        int m = size / 5;
+        g.setColor(color);
+        g.setStroke(new BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+
+        // Sustained flat line with slight wobble
+        Path2D wave = new Path2D.Double();
+        wave.moveTo(m, size / 2);
+        for (int x = m; x <= size - m; x++) {
+            double progress = (double) (x - m) / (size - m * 2);
+            double y = size / 2 + Math.sin(progress * Math.PI * 8) * 2;
+            wave.lineTo(x, y);
+        }
+        g.draw(wave);
+
+        // Infinity symbol for drone
+        g.setStroke(new BasicStroke(1.5f));
+        int iy = size * 3 / 4;
+        g.drawOval(m + 2, iy - 3, size / 4, 6);
+        g.drawOval(size / 2 - 2, iy - 3, size / 4, 6);
+    }
+
+    private static void drawPitchSynthIcon(Graphics2D g, int size, Color color) {
+        int m = size / 5;
+        g.setColor(color);
+        g.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+
+        // Pitch detection to synth
+        // Input wave (small)
+        g.drawLine(m, size / 3, m + size / 4, size / 3);
+
+        // Arrow
+        g.drawLine(m + size / 4 + 2, size / 3, size / 2, size / 2);
+
+        // Synth wave (output)
+        Path2D wave = new Path2D.Double();
+        wave.moveTo(size / 2, size / 2);
+        for (int x = size / 2; x <= size - m; x++) {
+            double progress = (double) (x - size / 2) / (size / 2 - m);
+            double y = size / 2 + Math.sin(progress * Math.PI * 3) * (size / 5);
+            wave.lineTo(x, y);
+        }
+        g.draw(wave);
+    }
+
+    private static void drawAcousticSimIcon(Graphics2D g, int size, Color color) {
+        int m = size / 5;
+        g.setColor(color);
+        g.setStroke(new BasicStroke(1.5f));
+
+        // Acoustic guitar body shape
+        int bodyW = size - m * 2;
+        int bodyH = size - m * 2;
+
+        // Upper bout
+        g.drawArc(m, m, bodyW, bodyH / 2, 0, 180);
+
+        // Lower bout (larger)
+        g.drawArc(m - 2, size / 2 - 2, bodyW + 4, bodyH / 2 + 2, 180, 180);
+
+        // Waist
+        g.drawLine(m, size / 2, m + 3, size / 2);
+        g.drawLine(size - m, size / 2, size - m - 3, size / 2);
+
+        // Sound hole
+        g.drawOval(size / 2 - 4, size / 2 - 2, 8, 8);
+    }
+
+    // --- Pitch ---
+
+    private static void drawHarmonizerIcon(Graphics2D g, int size, Color color) {
+        int m = size / 5;
+        g.setColor(color);
+        g.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+
+        // Two parallel note lines (harmony)
+        Path2D wave1 = new Path2D.Double();
+        Path2D wave2 = new Path2D.Double();
+        wave1.moveTo(m, size / 3);
+        wave2.moveTo(m, size * 2 / 3);
+
+        for (int x = m; x <= size - m; x++) {
+            double progress = (double) (x - m) / (size - m * 2);
+            double y1 = size / 3 + Math.sin(progress * Math.PI * 2) * (size / 8);
+            double y2 = size * 2 / 3 + Math.sin(progress * Math.PI * 2) * (size / 8);
+            wave1.lineTo(x, y1);
+            wave2.lineTo(x, y2);
+        }
+
+        g.draw(wave1);
+        g.setColor(new Color(color.getRed(), color.getGreen(), color.getBlue(), 180));
+        g.draw(wave2);
+
+        // Interval marker
+        g.setColor(color);
+        g.setFont(new Font("SansSerif", Font.PLAIN, size / 5));
+        g.drawString("3", size - m, size / 2 + 2);
+    }
+
+    private static void drawAutoTunerIcon(Graphics2D g, int size, Color color) {
+        int m = size / 5;
+        g.setColor(color);
+        g.setStroke(new BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+
+        // Pitch correction (wobbly to straight)
+        Path2D wave = new Path2D.Double();
+        wave.moveTo(m, size / 2);
+        for (int x = m; x <= size - m; x++) {
+            double progress = (double) (x - m) / (size - m * 2);
+            double wobble = (1 - progress) * Math.sin(progress * Math.PI * 6) * (size / 6);
+            double y = size / 2 + wobble;
+            wave.lineTo(x, y);
+        }
+        g.draw(wave);
+
+        // Target pitch line
+        g.setStroke(new BasicStroke(1f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10, new float[]{2, 2}, 0));
+        g.drawLine(m, size / 2, size - m, size / 2);
+    }
+
+    // --- Acoustic ---
+
+    private static void drawBodyResonanceIcon(Graphics2D g, int size, Color color) {
+        int m = size / 5;
+        int cx = size / 2;
+        int cy = size / 2;
+        g.setColor(color);
+        g.setStroke(new BasicStroke(1.5f));
+
+        // Guitar body outline
+        g.drawOval(m, m + 2, size - m * 2, size - m * 2 - 4);
+
+        // Resonance waves inside
+        g.setStroke(new BasicStroke(1f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        for (int i = 1; i <= 2; i++) {
+            int r = i * size / 6;
+            g.drawOval(cx - r, cy - r, r * 2, r * 2);
+        }
+
+        // Sound hole
+        g.fillOval(cx - 3, cy - 3, 6, 6);
+    }
+
+    private static void drawAntiFeedbackIcon(Graphics2D g, int size, Color color) {
+        int m = size / 5;
+        g.setColor(color);
+        g.setStroke(new BasicStroke(2f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+
+        // Feedback loop with X
+        int cx = size / 2;
+        int cy = size / 2;
+        int r = size / 3;
+
+        // Circular arrow (feedback)
+        g.drawArc(cx - r, cy - r, r * 2, r * 2, 45, 270);
+
+        // X through it (anti)
+        g.setColor(DarkTheme.ACCENT_ERROR);
+        g.setStroke(new BasicStroke(2.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+        g.drawLine(m + 2, m + 2, size - m - 2, size - m - 2);
+        g.drawLine(size - m - 2, m + 2, m + 2, size - m - 2);
+    }
+
+    private static void drawTwelveStringIcon(Graphics2D g, int size, Color color) {
+        int m = size / 5;
+        g.setColor(color);
+        g.setStroke(new BasicStroke(1f));
+
+        // 12 string pairs (6 pairs of 2)
+        int stringSpacing = (size - m * 2) / 7;
+        for (int i = 0; i < 6; i++) {
+            int x = m + stringSpacing / 2 + i * stringSpacing;
+            // Main string
+            g.drawLine(x, m, x, size - m);
+            // Octave string (thinner, slightly offset)
+            g.setStroke(new BasicStroke(0.5f));
+            g.drawLine(x + 2, m, x + 2, size - m);
+            g.setStroke(new BasicStroke(1f));
+        }
+
+        // "12" label
+        g.setFont(new Font("SansSerif", Font.BOLD, size / 4));
+        g.drawString("12", m - 2, size - m + 4);
+    }
+
+    private static void drawPiezoSweetenerIcon(Graphics2D g, int size, Color color) {
+        int m = size / 5;
+        g.setColor(color);
+        g.setStroke(new BasicStroke(1.5f));
+
+        // Piezo crystal shape (hexagon-ish)
+        int cx = size / 2;
+        int cy = size / 2;
+        int[] xPoints = new int[6];
+        int[] yPoints = new int[6];
+        for (int i = 0; i < 6; i++) {
+            double angle = Math.PI / 6 + i * Math.PI / 3;
+            xPoints[i] = (int)(cx + size / 3 * Math.cos(angle));
+            yPoints[i] = (int)(cy + size / 3 * Math.sin(angle));
+        }
+        g.drawPolygon(xPoints, yPoints, 6);
+
+        // Sparkle/sweet indicator
+        g.setColor(DarkTheme.ACCENT_WARNING);
+        g.fillOval(size - m - 2, m, 4, 4);
+        drawMiniStar(g, size - m, m + 2, 2);
+    }
+
+    private static void drawAcousticCompressorIcon(Graphics2D g, int size, Color color) {
+        int m = size / 5;
+        g.setColor(color);
+        g.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+
+        // Compression curve
+        Path2D curve = new Path2D.Double();
+        curve.moveTo(m, size - m);
+        curve.lineTo(size / 2, size / 2);
+        curve.lineTo(size - m, size / 3);
+        g.draw(curve);
+
+        // Guitar body hint (small)
+        g.setStroke(new BasicStroke(1f));
+        g.drawArc(m - 2, m, size / 3, size / 4, 0, 180);
+    }
+
+    private static void drawAcousticEQIcon(Graphics2D g, int size, Color color) {
+        int m = size / 6;
+        g.setColor(color);
+        g.setStroke(new BasicStroke(1.5f, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+
+        // EQ curve suited for acoustic
+        Path2D curve = new Path2D.Double();
+        curve.moveTo(m, size * 2 / 3);
+        curve.quadTo(size / 4, size / 2, size / 3, size / 2);  // Low cut
+        curve.quadTo(size / 2, size / 3, size * 2 / 3, size / 2);  // Mid scoop
+        curve.quadTo(size * 3 / 4, size / 2, size - m, size / 3);  // High shelf
+        g.draw(curve);
+
+        // Guitar sound hole hint
+        g.setStroke(new BasicStroke(1f));
+        g.drawOval(size / 2 - 3, size - m - 4, 6, 6);
+    }
 }

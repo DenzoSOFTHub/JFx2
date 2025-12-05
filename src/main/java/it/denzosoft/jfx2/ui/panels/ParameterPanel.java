@@ -1888,7 +1888,7 @@ public class ParameterPanel extends JPanel {
         if (name.contains("gain") || name.contains("level") || name.contains("volume")) {
             knob.setArcForegroundColor(DarkTheme.ACCENT_SUCCESS);
         } else if (name.contains("drive") || name.contains("distortion")) {
-            knob.setArcForegroundColor(DarkTheme.CATEGORY_DRIVE);
+            knob.setArcForegroundColor(DarkTheme.CATEGORY_DISTORTION);
         } else if (name.contains("mix") || name.contains("wet") || name.contains("dry")) {
             knob.setArcForegroundColor(DarkTheme.ACCENT_PRIMARY);
         }
@@ -1982,7 +1982,10 @@ public class ParameterPanel extends JPanel {
         combo.setSelectedIndex(param.getChoiceIndex());
         combo.setBackground(DarkTheme.BG_MEDIUM);
         combo.setForeground(DarkTheme.TEXT_PRIMARY);
-        combo.setPreferredSize(new Dimension(100, 26));
+        combo.setFont(DarkTheme.FONT_REGULAR);
+        combo.setPreferredSize(new Dimension(90, 28));
+        combo.setMinimumSize(new Dimension(80, 28));
+        combo.setMaximumSize(new Dimension(120, 28));
 
         // Set tooltip from parameter description
         if (param.getDescription() != null && !param.getDescription().isEmpty()) {

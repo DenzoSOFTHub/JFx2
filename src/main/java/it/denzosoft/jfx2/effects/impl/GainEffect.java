@@ -14,7 +14,7 @@ public class GainEffect extends AbstractEffect {
             "gain",
             "Gain",
             "Volume control with optional soft clipping/saturation",
-            EffectCategory.GAIN
+            EffectCategory.DYNAMICS
     );
 
     // Saturation mode names

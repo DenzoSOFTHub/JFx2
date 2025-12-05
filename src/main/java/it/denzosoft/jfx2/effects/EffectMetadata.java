@@ -31,4 +31,11 @@ public record EffectMetadata(
     public static EffectMetadata of(String id, String name, String description, EffectCategory category) {
         return new EffectMetadata(id, name, description, category, "JFx2", "1.0");
     }
+
+    /**
+     * Create metadata with author and version.
+     */
+    public static EffectMetadata of(String id, String name, String description, EffectCategory category, String author, String version) {
+        return new EffectMetadata(id, name, description, category, author, version);
+    }
 }

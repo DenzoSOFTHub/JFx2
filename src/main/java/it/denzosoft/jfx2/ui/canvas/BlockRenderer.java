@@ -476,8 +476,8 @@ public class BlockRenderer {
         NodeType type = node.getNodeType();
 
         switch (type) {
-            case INPUT -> { return DarkTheme.CATEGORY_INPUT; }
-            case OUTPUT -> { return DarkTheme.CATEGORY_OUTPUT; }
+            case INPUT -> { return DarkTheme.CATEGORY_INPUT_SOURCE; }
+            case OUTPUT -> { return DarkTheme.CATEGORY_OUTPUT_SINK; }
             case SPLITTER, MIXER -> { return DarkTheme.CATEGORY_UTILITY; }
             case EFFECT -> {
                 if (node instanceof EffectNode effectNode) {

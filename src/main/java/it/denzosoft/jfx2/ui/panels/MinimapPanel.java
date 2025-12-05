@@ -310,8 +310,8 @@ public class MinimapPanel extends JPanel {
      */
     private Color getNodeColor(ProcessingNode node) {
         return switch (node.getNodeType()) {
-            case INPUT -> DarkTheme.CATEGORY_INPUT;
-            case OUTPUT -> DarkTheme.CATEGORY_OUTPUT;
+            case INPUT -> DarkTheme.CATEGORY_INPUT_SOURCE;
+            case OUTPUT -> DarkTheme.CATEGORY_OUTPUT_SINK;
             case EFFECT -> {
                 if (node.isBypassed()) {
                     yield DarkTheme.TEXT_DISABLED;
@@ -320,12 +320,7 @@ public class MinimapPanel extends JPanel {
                     var effect = effectNode.getEffect();
                     if (effect != null) {
                         EffectCategory cat = effect.getMetadata().category();
-                        if (cat == EffectCategory.DISTORTION) yield DarkTheme.CATEGORY_DRIVE;
-                        else if (cat == EffectCategory.MODULATION) yield DarkTheme.CATEGORY_MODULATION;
-                        else if (cat == EffectCategory.DELAY || cat == EffectCategory.REVERB) yield DarkTheme.CATEGORY_TIME;
-                        else if (cat == EffectCategory.DYNAMICS) yield DarkTheme.CATEGORY_DYNAMICS;
-                        else if (cat == EffectCategory.EQ || cat == EffectCategory.FILTER) yield DarkTheme.CATEGORY_EQ;
-                        else yield DarkTheme.BLOCK_BG;
+                        yield DarkTheme.getCategoryColor(cat.name());
                     }
                 }
                 yield DarkTheme.BLOCK_BG;
