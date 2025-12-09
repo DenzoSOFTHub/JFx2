@@ -13,7 +13,8 @@ JFx2 is a real-time audio processing application designed for guitarists and aud
 ### Key Features
 
 - **Node-Based Signal Routing**: Visual drag-and-drop interface for creating complex signal chains with parallel and serial routing
-- **70+ Audio Effects**: Comprehensive collection including distortion, delay, reverb, modulation, pitch, dynamics, and more
+- **75+ Audio Effects**: Comprehensive collection including distortion, delay, reverb, modulation, pitch, dynamics, acoustic, and more
+- **Plugin System**: Extend JFx2 with custom effect plugins (bold highlighting in effect tree)
 - **Amp & Cabinet Simulation**: Realistic tube amp modeling with preamp, power amp, and cabinet simulation
 - **Neural Amp Modeling (NAM)**: Load and use neural network amp/effect models (.nam files)
 - **Impulse Response Support**: Load custom IR files for cabinet simulation
@@ -103,7 +104,7 @@ For detailed instructions, see the **[User Manual](docs/USER_MANUAL.md)**.
 
 ---
 
-## Effects Library (70+ Effects)
+## Effects Library (75+ Effects)
 
 ### Input Sources
 
@@ -216,6 +217,19 @@ For detailed instructions, see the **[User Manual](docs/USER_MANUAL.md)**.
 | [**Harmonizer**](docs/effects/HarmonizerEffect.md) | Intelligent harmonies based on scale and key |
 | [**Auto Tuner**](docs/effects/AutoTunerEffect.md) | Gentle pitch correction with expression preservation |
 
+### Acoustic Processing
+
+| Effect | Description |
+|--------|-------------|
+| [**Acoustic Sim**](docs/effects/AcousticSimEffect.md) | Electric to acoustic guitar body simulation (10 models) |
+| [**Pickup Emulator**](docs/effects/PickupEmulatorEffect.md) | Transform pickup tones (humbucker ↔ single coil ↔ P90 ↔ piezo) |
+| [**Body Resonance**](docs/effects/BodyResonanceEffect.md) | Add acoustic body resonance to electric guitars |
+| [**Piezo Sweetener**](docs/effects/PiezoSweetenerEffect.md) | Warm up harsh piezo pickup sound |
+| [**12-String Simulator**](docs/effects/TwelveStringSimulatorEffect.md) | Simulate 12-string guitar with octave doubling |
+| [**Acoustic Compressor**](docs/effects/AcousticCompressorEffect.md) | Gentle compression optimized for acoustic guitar |
+| [**Acoustic EQ**](docs/effects/AcousticEQEffect.md) | 5-band EQ with acoustic presets (body, presence, air) |
+| [**Anti-Feedback**](docs/effects/AntiFeedbackEffect.md) | Automatic feedback detection and notch filtering |
+
 ### Synth & Special
 
 | Effect | Description |
@@ -223,7 +237,6 @@ For detailed instructions, see the **[User Manual](docs/USER_MANUAL.md)**.
 | [**Synth**](docs/effects/SynthEffect.md) | Guitar-triggered synthesizer with filter and envelope |
 | [**Synth Drone**](docs/effects/SynthDroneEffect.md) | Pitch-tracking drone oscillators with intervals |
 | [**Pitch Synth**](docs/effects/PitchSynthEffect.md) | Full polyphonic synth with wavetables and ADSR |
-| [**Acoustic Sim**](docs/effects/AcousticSimEffect.md) | Electric to acoustic guitar body simulation (10 models) |
 
 ### Utility
 
@@ -334,7 +347,9 @@ JFx2/
 │   ├── audio/          # Audio I/O backend
 │   ├── dsp/            # DSP utilities (filters, delay lines)
 │   ├── effects/        # Effect implementations
-│   │   └── impl/       # Individual effect classes
+│   │   ├── impl/       # Individual effect classes
+│   │   ├── acoustic/   # Acoustic guitar processing effects
+│   │   └── plugin/     # Plugin system (ServiceLoader)
 │   ├── graph/          # Signal flow graph
 │   ├── nam/            # Neural Amp Modeler support
 │   ├── preset/         # Rig/preset management
@@ -344,6 +359,7 @@ JFx2/
 │       ├── controls/   # Custom UI controls
 │       ├── dialogs/    # Dialog windows
 │       └── panels/     # UI panels
+├── plugins/            # External effect plugins (JARs)
 ├── presets/            # Factory presets
 ├── docs/               # Documentation
 │   ├── USER_MANUAL.md  # User guide
@@ -371,7 +387,7 @@ Developed by **DenzoSOFT**
 
 ## License
 
-Copyright (c) 2024 DenzoSOFT. All rights reserved.
+Copyright (c) 2025 DenzoSOFT. All rights reserved.
 
 This software is proprietary and confidential. Unauthorized copying, distribution, or modification is strictly prohibited.
 
