@@ -87,3 +87,6 @@ claude.md
 
 # GitHub token file (NEVER commit this!)
 .github_token
+
+# Shell scripts (local dev scripts)
+*.sh
